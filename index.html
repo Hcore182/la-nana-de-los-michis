@@ -539,6 +539,7 @@
     .slot.selected { border-color: var(--pink-deep); background: var(--pink-mist); }
     .slot[disabled] { opacity: .4; cursor: default; text-decoration: line-through; }
     .slot .tag { display: block; font-size: 11px; font-weight: 800; color: var(--caramel-dark); }
+    .slot-note { margin-top: 4px; padding: 12px 14px; border-radius: 14px; background: var(--beige-soft); color: var(--cocoa-sub); font-size: 14px; font-weight: 600; text-align: center; }
     .empty-msg { padding: 22px; text-align: center; background: var(--cream); border-radius: 16px; color: var(--cocoa-sub); }
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -943,7 +944,6 @@
       const hh = h % 12 === 0 ? 12 : h % 12;
       return hh + ':00 ' + (h < 12 ? 'a. m.' : 'p. m.');
     };
-    const shortHour = h => (h % 12 === 0 ? 12 : h % 12) + ':00';
     const waLink = text => 'https://wa.me/' + C.whatsappNumber + (text ? '?text=' + encodeURIComponent(text) : '');
 
     /* ── Rellenar datos desde la configuración ── */
@@ -1042,7 +1042,7 @@
 
     function renderSlots() {
       const d = state.date;
-      $('#slotsDate').innerHTML = 'Elige la franja en la que quieres que lleguemos el <b>' + DAYS[d.getDay()] + ' ' + d.getDate() + ' de ' + MONTHS[d.getMonth()] + '</b>' + (isSpecial(d) ? ' · tarifa domingo/festivo' : '');
+      $('#slotsDate').innerHTML = '¿A qué hora quieres que lleguemos el <b>' + DAYS[d.getDay()] + ' ' + d.getDate() + ' de ' + MONTHS[d.getMonth()] + '</b>?' + (isSpecial(d) ? ' (tarifa de domingo o festivo)' : '');
       const slots = slotsFor(d);
       const groups = [['Mañana', s => s.h < 12], ['Tarde', s => s.h >= 12 && s.h < 18], ['Noche', s => s.h >= 18]];
       let html = '';
@@ -1050,11 +1050,11 @@
         const list = slots.filter(fn);
         if (!list.length) return;
         html += '<div class="slot-group"><h4>' + name + '</h4><div class="slots">' + list.map(s =>
-          '<button class="slot' + (state.hour === s.h ? ' selected' : '') + '" data-h="' + s.h + '"' + (s.ok ? '' : ' disabled') + ' aria-label="Llegada entre las ' + hourLabel(s.h) + ' y las ' + hourLabel(s.h + 1) + (isNight(s.h) ? ', con recargo nocturno' : '') + (s.ok ? '' : ', no disponible') + '">' +
-          hourLabel(s.h) + '<small>llegamos entre ' + shortHour(s.h) + ' y ' + shortHour(s.h + 1) + '</small>' + (isNight(s.h) ? '<span class="tag">+' + C.prices.nightSurchargePct + '%</span>' : '') + '</button>'
+          '<button class="slot' + (state.hour === s.h ? ' selected' : '') + '" data-h="' + s.h + '"' + (s.ok ? '' : ' disabled') + ' aria-label="Llegada a las ' + hourLabel(s.h) + (isNight(s.h) ? ', con recargo nocturno' : '') + (s.ok ? '' : ', no disponible') + '">' +
+          hourLabel(s.h) + (isNight(s.h) ? '<span class="tag">+' + C.prices.nightSurchargePct + '%</span>' : '') + '</button>'
         ).join('') + '</div></div>';
       });
-      $('#slotsWrap').innerHTML = slots.some(s => s.ok) ? html : '<p class="empty-msg">Ya no quedan horas este día. Elige otro día 🐾</p>';
+      $('#slotsWrap').innerHTML = slots.some(s => s.ok) ? html + '<p class="slot-note">🐾 Te avisamos por WhatsApp cuando vamos en camino.</p>' : '<p class="empty-msg">Ya no quedan horas este día. Elige otro día 🐾</p>';
     }
 
     function quote() {
@@ -1065,7 +1065,7 @@
         const end = new Date(d); end.setDate(end.getDate() + P.weekPackDays - 1);
         rows.push(['Servicio', 'Semana michi · ' + P.weekPackDays + ' días']);
         rows.push(['Fechas', d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ' – ' + end.getDate() + ' ' + MONTHS[end.getMonth()].slice(0, 3)]);
-        rows.push(['Llegada diaria', 'entre ' + hourLabel(h) + ' y ' + hourLabel(h + 1)]);
+        rows.push(['Llegada diaria', hourLabel(h)]);
         total = P.weekPack * (isNight(h) ? 1 + P.nightSurchargePct / 100 : 1);
         total = Math.ceil(total / 1000) * 1000;
         if (isNight(h)) rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']);
@@ -1073,7 +1073,7 @@
         const special = isSpecial(d);
         rows.push(['Servicio', 'Visita michi']);
         rows.push(['Día', DAYS[d.getDay()] + ' ' + d.getDate() + ' de ' + MONTHS[d.getMonth()]]);
-        rows.push(['Llegada', 'entre ' + hourLabel(h) + ' y ' + hourLabel(h + 1)]);
+        rows.push(['Llegada', hourLabel(h)]);
         total = special ? P.visitHoliday : P.visit;
         if (special) rows.push(['Tarifa', 'Domingo o festivo']);
         if (isNight(h)) { rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']); total = Math.ceil(total * (1 + P.nightSurchargePct / 100) / 1000) * 1000; }
