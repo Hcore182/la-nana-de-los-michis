@@ -34,6 +34,12 @@
       visitHoliday: 47000,   // Visita en domingo o festivo
       weekPack:     196000,  // Paquete Semana Michi: 7 días, 1 visita diaria
       weekPackDays: 7,
+      extraCat:     7000,    // Por cada gato adicional, por visita
+      byCats: {             // Precios exactos con 1, 2, 3 y 4 gatos
+        visit:        [31000, 38000, 45000, 51000],
+        visitHoliday: [47000, 57000, 67000, 76000],
+        weekPack:     [196000, 240000, 284000, 322000],
+      },
       nightSurchargePct: 20, // Recargo por horario nocturno o muy temprano
       depositPct:   50,      // Anticipo para reservar
     },
@@ -747,7 +753,7 @@
         <div class="section-head reveal">
           <span class="label">Tarifas</span>
           <h2 class="title">Precios claros, <span class="hl">sin sorpresas</span></h2>
-          <p class="sub">Transporte incluido dentro de <span data-city>Fusagasugá</span>. Precios por un gato.</p>
+          <p class="sub">Transporte incluido dentro de <span data-city>Fusagasugá</span>. Precios por un gato; cada gato adicional suma unos <span data-price="extraCat">$7.000</span> por visita.</p>
         </div>
         <div class="plans">
           <article class="plan reveal">
@@ -821,7 +827,7 @@
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 48 horas o más de anticipación te devolvemos el anticipo. Con menos de 48 horas el anticipo no se devuelve, porque ese cupo ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En la visita previa, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
           <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
-          <details class="reveal"><summary>¿Y si tengo más de un gato?</summary><p>¡Felices de conocerlos a todos! Cuéntanos cuántos son al agendar y te confirmamos el valor por WhatsApp.</p></details>
+          <details class="reveal"><summary>¿Y si tengo más de un gato?</summary><p>¡Felices de conocerlos a todos! Cada gato adicional suma unos <span data-price="extraCat">$7.000</span> por visita. Al agendar eliges cuántos son y ves el valor exacto antes de enviar tu solicitud.</p></details>
         </div>
       </div>
     </section>
@@ -902,10 +908,10 @@
         <div data-step="3" hidden>
           <div class="summary" id="summary"></div>
           <form class="form-grid" id="bookForm" novalidate>
+            <div class="field"><label for="fCats">¿Cuántos gatos?</label><select id="fCats"><option>1</option><option>2</option><option>3</option><option>4 o más</option></select></div>
+            <div class="field"><label for="fCat">Nombre de tu michi</label><input id="fCat" required /><span class="msg">¿Cómo se llama tu michi?</span></div>
             <div class="field"><label for="fName">Tu nombre</label><input id="fName" autocomplete="name" required /><span class="msg">Cuéntanos tu nombre.</span></div>
             <div class="field"><label for="fPhone">Celular</label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" required /><span class="msg">Escribe un celular válido.</span></div>
-            <div class="field"><label for="fCat">Nombre de tu michi</label><input id="fCat" required /><span class="msg">¿Cómo se llama tu michi?</span></div>
-            <div class="field"><label for="fCats">¿Cuántos gatos?</label><select id="fCats"><option>1</option><option>2</option><option>3</option><option>4 o más</option></select></div>
             <div class="field full"><label for="fAddr">Barrio o dirección</label><input id="fAddr" autocomplete="street-address" required /><span class="msg">Necesitamos saber a dónde ir.</span></div>
             <div class="field full"><label for="fNotes">Algo que debamos saber <em>(opcional)</em></label><textarea id="fNotes" placeholder="Medicamentos, mañas, si es tímido, plantas por regar…"></textarea></div>
           </form>
@@ -1061,12 +1067,17 @@
       const P = C.prices, d = state.date, h = state.hour;
       const rows = [];
       let total;
+      // Precio según número de gatos (tabla de la calculadora; si falta, suma extraCat por gato)
+      const catsVal = $('#fCats').value;
+      const cats = Math.min(4, parseInt(catsVal, 10) || 1);
+      const byCat = (key, base) => (P.byCats && P.byCats[key] && P.byCats[key][cats - 1]) || base + (P.extraCat || 0) * (cats - 1) * (key === 'weekPack' ? P.weekPackDays : 1);
       if (state.service === 'pack') {
         const end = new Date(d); end.setDate(end.getDate() + P.weekPackDays - 1);
         rows.push(['Servicio', 'Semana michi · ' + P.weekPackDays + ' días']);
         rows.push(['Fechas', d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ' – ' + end.getDate() + ' ' + MONTHS[end.getMonth()].slice(0, 3)]);
         rows.push(['Llegada diaria', hourLabel(h)]);
-        total = P.weekPack * (isNight(h) ? 1 + P.nightSurchargePct / 100 : 1);
+        rows.push(['Gatos', catsVal]);
+        total = byCat('weekPack', P.weekPack) * (isNight(h) ? 1 + P.nightSurchargePct / 100 : 1);
         total = Math.ceil(total / 1000) * 1000;
         if (isNight(h)) rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']);
       } else {
@@ -1074,7 +1085,8 @@
         rows.push(['Servicio', 'Visita michi']);
         rows.push(['Día', DAYS[d.getDay()] + ' ' + d.getDate() + ' de ' + MONTHS[d.getMonth()]]);
         rows.push(['Llegada', hourLabel(h)]);
-        total = special ? P.visitHoliday : P.visit;
+        rows.push(['Gatos', catsVal]);
+        total = special ? byCat('visitHoliday', P.visitHoliday) : byCat('visit', P.visit);
         if (special) rows.push(['Tarifa', 'Domingo o festivo']);
         if (isNight(h)) { rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']); total = Math.ceil(total * (1 + P.nightSurchargePct / 100) / 1000) * 1000; }
       }
@@ -1085,7 +1097,7 @@
       const q = quote();
       $('#summary').innerHTML = q.rows.map(r => '<div class="summary-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('') +
         '<div class="summary-row total"><span>Valor estimado</span><span>' + money(q.total) + '</span></div>' +
-        '<small>Anticipo para reservar: ' + money(q.deposit) + ' (' + C.prices.depositPct + '%). Precio por 1 gato; lo confirmamos por WhatsApp.</small>';
+        '<small>Anticipo para reservar: ' + money(q.deposit) + ' (' + C.prices.depositPct + '%). ' + ($('#fCats').value === '4 o más' ? 'Con más de 4 gatos te confirmamos el valor por WhatsApp.' : 'Lo confirmamos por WhatsApp.') + '</small>';
     }
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
@@ -1176,6 +1188,7 @@
       return ok;
     }
     $$('#bookForm input').forEach(el => el.addEventListener('input', () => el.closest('.field').classList.remove('err')));
+    $('#fCats').addEventListener('change', renderSummary);
 
     let lastMsg = '';
     $('#bookNext').addEventListener('click', () => {
