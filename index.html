@@ -41,7 +41,7 @@
         weekPack:     [196000, 240000, 284000, 322000],
       },
       nightSurchargePct: 20, // Recargo por horario nocturno o muy temprano
-      depositPct:   50,      // Anticipo para reservar
+      depositPct:   50,      // Anticipo de la Semana michi (la visita suelta se paga completa)
     },
     // ── Agenda ────────────────────────────────────────────────────────
     schedule: {
@@ -721,7 +721,7 @@
         </div>
         <div class="steps">
           <div class="step reveal"><div class="step-ico">📅</div><h3>Elige día y hora</h3><p>Abre el calendario y escoge el día y la hora de la visita.</p></div>
-          <div class="step reveal"><div class="step-ico">💬</div><h3>Confirma por WhatsApp</h3><p>Te llega la reserva por WhatsApp, confirmamos y separas tu cupo con el anticipo.</p></div>
+          <div class="step reveal"><div class="step-ico">💬</div><h3>Confirma por WhatsApp</h3><p>Te llega la reserva por WhatsApp, confirmamos que tenemos el cupo y te contamos cómo pagar.</p></div>
           <div class="step reveal"><div class="step-ico">🔑</div><h3>Nos conocemos</h3><p>Antes de empezar te visitamos: conocemos a tu michi y sus mañas, y acordamos contigo cómo recibir y cuidar el acceso a tu casa (llaves, portería o clave).</p></div>
           <div class="step reveal"><div class="step-ico">😻</div><h3>Viaja tranquilo</h3><p>Cuidamos a tu gato en su casa y te mandamos video 360° y reporte en cada visita.</p></div>
         </div>
@@ -824,8 +824,9 @@
         <div class="faq-list">
           <details class="reveal"><summary>¿Qué hacemos en cada visita?</summary><p>Le damos comida y agua fresca, limpiamos su arena, sacamos la basurita, jugamos y lo consentimos, y te mandamos el video 360°. En la visita previa te contamos cómo organizamos la visita según tu michi.</p></details>
           <details class="reveal"><summary>¿Qué es el video 360°?</summary><p>En cada visita grabamos un video que recorre todo alrededor: ves a tu michi, cómo está, su comida, su arenero y cómo queda su espacio. Te lo mandamos por WhatsApp para que estés tranquilo estés donde estés.</p></details>
-          <details class="reveal"><summary>¿Cómo separo mi cupo?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Confirmamos la disponibilidad y separas el cupo con un anticipo del <span data-deposit>50</span>%.</p></details>
-          <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos el anticipo. Con menos de 6 horas el anticipo no se devuelve, porque ese cupo ya quedó reservado para tu michi.</p></details>
+          <details class="reveal"><summary>¿Cómo separo mi cupo?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te confirmamos que tenemos el cupo y, con tu pago, la reserva queda lista.</p></details>
+          <details class="reveal"><summary>¿Cuándo pago?</summary><p><b>Visita michi o de domingo/festivo:</b> pagas el valor total cuando te confirmamos el cupo, y la visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% cuando te confirmamos el cupo, y el saldo en la visita previa, cuando nos reunimos para coordinar el acceso a tu casa.</p></details>
+          <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese cupo ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En la visita previa, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
           <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
           <details class="reveal"><summary>¿Y si tengo más de un gato?</summary><p>¡Felices de conocerlos a todos! Cada gato adicional suma unos <span data-price="extraCat">$7.000</span> por visita. Al agendar eliges cuántos son y ves el valor exacto antes de enviar tu solicitud.</p></details>
@@ -923,7 +924,7 @@
           <div class="done">
             <img src="Assets/img/logo-michi.png" alt="" />
             <h3>¡Casi listo!</h3>
-            <p>Abrimos WhatsApp con tu solicitud. Envía el mensaje y te confirmamos la disponibilidad y el anticipo.</p>
+            <p>Abrimos WhatsApp con tu solicitud. Envía el mensaje y te confirmamos el cupo y cómo pagar.</p>
             <div class="btns">
               <a class="btn btn-wa" id="doneWa" href="#" target="_blank" rel="noopener">Abrir WhatsApp de nuevo</a>
               <button class="btn btn-ghost" id="doneIcs">Agregar a mi calendario</button>
@@ -1092,14 +1093,24 @@
         if (special) rows.push(['Tarifa', 'Domingo o festivo']);
         if (isNight(h)) { rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']); total = Math.ceil(total * (1 + P.nightSurchargePct / 100) / 1000) * 1000; }
       }
-      return { rows, total, deposit: Math.ceil(total * P.depositPct / 100 / 1000) * 1000 };
+      // Visita suelta: pago total al confirmar el cupo. Paquete: anticipo al confirmar y saldo en la visita previa.
+      const isPack = state.service === 'pack';
+      const deposit = isPack ? Math.ceil(total * P.depositPct / 100 / 1000) * 1000 : total;
+      const payLines = isPack
+        ? [['Anticipo al confirmar tu cupo (' + P.depositPct + '%)', deposit], ['Saldo en la visita previa', total - deposit]]
+        : [['Pago al confirmar tu cupo', total]];
+      return { rows, total, deposit, payLines };
     }
 
     function renderSummary() {
       const q = quote();
       $('#summary').innerHTML = q.rows.map(r => '<div class="summary-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('') +
         '<div class="summary-row total"><span>Valor estimado</span><span>' + money(q.total) + '</span></div>' +
-        '<small>Anticipo para reservar: ' + money(q.deposit) + ' (' + C.prices.depositPct + '%). ' + ($('#fCats').value === '4 o más' ? 'Con más de 4 gatos te confirmamos el valor por WhatsApp.' : 'Lo confirmamos por WhatsApp.') + '</small>';
+        q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
+        '<small>' + (state.service === 'pack'
+          ? 'Primero confirmamos que tenemos el cupo; luego pagas el anticipo. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
+          : 'Primero confirmamos que tenemos el cupo; luego pagas la visita y queda confirmada. ') +
+        ($('#fCats').value === '4 o más' ? 'Con más de 4 gatos te confirmamos el valor por WhatsApp.' : '') + '</small>';
     }
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
@@ -1233,7 +1244,9 @@
       const q = quote();
       const lines = ['¡Hola! 🐾 Quiero agendar una visita con La nAna de los Michis.', ''];
       q.rows.forEach(r => lines.push('• ' + r[0] + ': ' + r[1]));
-      lines.push('• Valor estimado: ' + money(q.total) + ' (anticipo ' + money(q.deposit) + ')', '');
+      lines.push('• Valor estimado: ' + money(q.total));
+      q.payLines.forEach(p => lines.push('• ' + p[0] + ': ' + money(p[1])));
+      lines.push('');
       lines.push('Mis datos:');
       const cats = ['1', '2', '3', '4 o más'].includes($('#fCats').value) ? $('#fCats').value : '1';
       lines.push('• Nombre: ' + val('fName'));
