@@ -386,6 +386,14 @@
     .plan h3 { font-family: 'Fredoka', sans-serif; font-size: 25px; font-weight: 600; margin-bottom: 4px; }
     .plan .desc { font-size: 15px; color: var(--cocoa-sub); margin-bottom: 18px; min-height: 48px; }
     .plan .price { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 46px; line-height: 1; color: var(--pink-dark); font-variant-numeric: tabular-nums; }
+    .plan .price-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .plan-info {
+      flex-shrink: 0; margin-left: auto; padding: 7px 14px; border-radius: 100px;
+      background: var(--pink-mist); border: 1.5px solid var(--pink-soft);
+      font-size: 13px; font-weight: 800; color: var(--pink-dark); white-space: nowrap;
+      transition: background var(--t), border-color var(--t), transform var(--t);
+    }
+    .plan-info:hover { background: var(--pink-soft); border-color: var(--pink); transform: translateY(-2px); }
     .plan .per { font-size: 14px; font-weight: 700; color: var(--cocoa-light); margin: 6px 0 22px; }
     .plan ul { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; flex: 1; }
     .plan li { font-size: 15px; display: flex; gap: 10px; align-items: flex-start; }
@@ -661,6 +669,8 @@
       .footer-inner { flex-direction: column; text-align: center; }
     }
     @media (max-width: 560px) {
+      .plan { padding: 30px 20px 24px; }
+      .plan .price { font-size: clamp(34px, 9.5vw, 46px); }
       .section { padding: 68px 16px; }
       .steps { grid-template-columns: 1fr; }
       .includes-list { grid-template-columns: 1fr; }
@@ -801,13 +811,16 @@
         <div class="section-head reveal">
           <span class="label">Tarifas</span>
           <h2 class="title">Precios claros, <span class="hl">sin sorpresas</span></h2>
-          <p class="sub">Transporte incluido dentro de <span data-city>Fusagasugá</span>. Precios por un gato; cada gato adicional suma unos <span data-price="extraCat">$7.000</span> por visita.</p>
+          <p class="sub">Transporte incluido dentro de <span data-city>Fusagasugá</span>. Precios por un gato.</p>
         </div>
         <div class="plans">
           <article class="plan reveal">
             <h3>Visita michi</h3>
             <p class="desc">Una visita a domicilio, de lunes a sábado.</p>
-            <div class="price" data-price="visit">$31.000</div>
+            <div class="price-row">
+              <div class="price" data-price="visit">$31.000</div>
+              <a class="plan-info" href="#incluye">¿Qué incluye?</a>
+            </div>
             <div class="per">por visita</div>
             <ul>
               <li>Comida, agua y arena</li>
@@ -820,7 +833,10 @@
             <span class="ribbon">El favorito</span>
             <h3>Semana michi</h3>
             <p class="desc"><span data-pack-days>7</span> días seguidos, una visita diaria. Ideal para viajes.</p>
-            <div class="price" data-price="weekPack">$196.000</div>
+            <div class="price-row">
+              <div class="price" data-price="weekPack">$196.000</div>
+              <a class="plan-info" href="#incluye">¿Qué incluye?</a>
+            </div>
             <div class="per">equivale a <span data-pack-per>$28.000</span> por visita</div>
             <ul>
               <li>Todo lo de la visita, cada día</li>
@@ -833,7 +849,10 @@
           <article class="plan reveal">
             <h3>Domingo o festivo</h3>
             <p class="desc">Porque tu michi también come los domingos.</p>
-            <div class="price" data-price="visitHoliday">$47.000</div>
+            <div class="price-row">
+              <div class="price" data-price="visitHoliday">$47.000</div>
+              <a class="plan-info" href="#incluye">¿Qué incluye?</a>
+            </div>
             <div class="per">por visita</div>
             <ul>
               <li>La misma visita completa</li>
