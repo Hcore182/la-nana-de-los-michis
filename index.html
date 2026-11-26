@@ -27,6 +27,7 @@
     instagram: "",   // ej. "https://www.instagram.com/lananadelosmichis"
     tiktok:    "",   // ej. "https://www.tiktok.com/@lananadelosmichis"
     city: "Fusagasugá",
+    paymentMethods: ["Nequi", "Daviplata", "Llave Bre-B"],   // Medios de pago
 
     // ── Precios (salen de la calculadora de tarifas) ──────────────────
     prices: {
@@ -825,7 +826,7 @@
           <details class="reveal"><summary>¿Qué hacemos en cada visita?</summary><p>Le damos comida y agua fresca, limpiamos su arena, sacamos la basurita, jugamos y lo consentimos, y te mandamos el video 360°. En la visita previa te contamos cómo organizamos la visita según tu michi.</p></details>
           <details class="reveal"><summary>¿Qué es el video 360°?</summary><p>En cada visita grabamos un video que recorre todo alrededor: ves a tu michi, cómo está, su comida, su arenero y cómo queda su espacio. Te lo mandamos por WhatsApp para que estés tranquilo estés donde estés.</p></details>
           <details class="reveal"><summary>¿Cómo separo mi cupo?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te confirmamos que tenemos el cupo y, con tu pago, la reserva queda lista.</p></details>
-          <details class="reveal"><summary>¿Cuándo pago?</summary><p><b>Visita michi o de domingo/festivo:</b> pagas el valor total cuando te confirmamos el cupo, y la visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% cuando te confirmamos el cupo, y el saldo en la visita previa, cuando nos reunimos para coordinar el acceso a tu casa.</p></details>
+          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p><b>Visita michi o de domingo/festivo:</b> pagas el valor total cuando te confirmamos el cupo, y la visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% cuando te confirmamos el cupo, y el saldo en la visita previa, cuando nos reunimos para coordinar el acceso a tu casa.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>. Te enviamos los datos por WhatsApp al confirmar tu cupo.</p></details>
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese cupo ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En la visita previa, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
           <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
@@ -961,6 +962,8 @@
     $$('[data-pack-days]').forEach(el => el.textContent = C.prices.weekPackDays);
     $$('[data-pack-per]').forEach(el => el.textContent = money(Math.round(C.prices.weekPack / C.prices.weekPackDays / 100) * 100));
     $$('[data-deposit]').forEach(el => el.textContent = C.prices.depositPct);
+    const payText = C.paymentMethods.length > 1 ? C.paymentMethods.slice(0, -1).join(', ') + ' o ' + C.paymentMethods[C.paymentMethods.length - 1] : C.paymentMethods.join('');
+    $$('[data-pay]').forEach(el => el.textContent = payText);
     $$('[data-wa]').forEach(el => el.href = waLink('¡Hola! 🐾 Quiero información sobre el cuidado de mi michi.'));
     $('#year').textContent = new Date().getFullYear();
     const fl = $('#footerLinks');
@@ -1110,6 +1113,7 @@
         '<small>' + (state.service === 'pack'
           ? 'Primero confirmamos que tenemos el cupo; luego pagas el anticipo. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
           : 'Primero confirmamos que tenemos el cupo; luego pagas la visita y queda confirmada. ') +
+        'Pagas por ' + payText + '. ' +
         ($('#fCats').value === '4 o más' ? 'Con más de 4 gatos te confirmamos el valor por WhatsApp.' : '') + '</small>';
     }
 
