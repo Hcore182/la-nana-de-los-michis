@@ -22,3 +22,10 @@ Todo lo que cambia seguido está en el bloque `SITE_CONFIG` al inicio de `index.
 El cliente elige servicio, día y hora y llena sus datos. La página arma el mensaje
 y abre WhatsApp con la solicitud. La reserva se confirma por WhatsApp con el anticipo.
 Para que una hora no vuelva a aparecer disponible, agrégala a `bookedSlots`.
+
+## Reservas en Google Sheets
+Las reservas se pueden guardar en una hoja de Google, con correo de confirmación y
+bloqueo automático de horas. Guía de activación: [agenda-google/GUIA.md](agenda-google/GUIA.md).
+Mientras `bookingApiUrl` esté vacío, la agenda funciona solo con WhatsApp.
+
+La política de tratamiento de datos está en `privacidad.html`.

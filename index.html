@@ -29,6 +29,11 @@
     city: "Fusagasugá",
     paymentMethods: ["Nequi", "Daviplata", "Llave Bre-B"],   // Medios de pago
 
+    // ── Reservas en Google Sheets (ver agenda-google/GUIA.md) ─────────
+    // Pega aquí la URL de la aplicación web de Apps Script. Vacío = solo WhatsApp.
+    bookingApiUrl: "",
+    bookingHoldHours: 3,   // Horas que se guarda una reserva pendiente
+
     // ── Precios (salen de la calculadora de tarifas) ──────────────────
     prices: {
       visit:        31000,   // Visita michi, entre semana
@@ -615,6 +620,14 @@
     .field.err input { border-color: #D64545; }
     .field .msg { font-size: 13px; color: #B83232; display: none; }
     .field.err .msg { display: block; }
+    .check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: var(--cocoa-sub); cursor: pointer; }
+    .check input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; accent-color: var(--pink-deep); }
+    .check a { color: var(--pink-dark); font-weight: 700; text-decoration: underline; }
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    .book-alert { margin-bottom: 14px; padding: 12px 14px; border-radius: 14px; background: #FDECEC; border: 1px solid #F2B8B8; color: #8A2D2D; font-size: 14px; font-weight: 700; }
+    .cal-status { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--cocoa-light); }
+    .done-code { display: inline-block; margin: 0 0 14px; padding: 8px 16px; border-radius: 12px; background: var(--pink-mist); border: 1.5px dashed var(--pink); font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 600; color: var(--pink-dark); letter-spacing: 1px; }
+    .done-note { font-size: 13px; color: var(--cocoa-light); }
     .field .count { align-self: flex-end; font-size: 12px; color: var(--cocoa-light); font-variant-numeric: tabular-nums; }
 
     .summary { background: var(--cream); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; margin-bottom: 16px; }
@@ -999,6 +1012,7 @@
       <div class="progress" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
 
       <div class="sheet-body" id="bookBody">
+        <div class="book-alert" id="bookAlert" role="alert" hidden></div>
         <!-- Paso 1: servicio + fecha -->
         <div data-step="1">
           <div class="services" role="radiogroup" aria-label="Tipo de servicio">
@@ -1012,6 +1026,7 @@
           </div>
           <div class="cal-grid" id="calGrid"></div>
           <div class="legend"><span><i></i>Domingo o festivo (tarifa especial)</span></div>
+          <p class="cal-status" id="calStatus" hidden>Consultando horarios disponibles…</p>
         </div>
 
         <!-- Paso 2: hora -->
@@ -1030,6 +1045,8 @@
             <div class="field"><label for="fPhone">Celular</label><input id="fPhone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="3001234567" required aria-describedby="fPhoneMsg" /><span class="msg" id="fPhoneMsg"></span></div>
             <div class="field full"><label for="fAddr">Barrio o dirección</label><input id="fAddr" maxlength="120" autocomplete="street-address" placeholder="Ej.: Barrio Pekín, Calle 8 # 5-20" required aria-describedby="fAddrMsg" /><span class="msg" id="fAddrMsg"></span></div>
             <div class="field full"><label for="fNotes">Algo que debamos saber <em>(opcional)</em></label><textarea id="fNotes" maxlength="500" placeholder="Medicamentos, mañas, si es tímido…" aria-describedby="fNotesCount"></textarea><span class="count" id="fNotesCount">0/500</span></div>
+            <div class="field full"><label class="check" for="fConsent"><input type="checkbox" id="fConsent" /><span>Autorizo a La nAna de los Michis a usar mis datos para gestionar mi reserva, según la <a href="privacidad.html" target="_blank" rel="noopener">política de tratamiento de datos</a>.</span></label><span class="msg" id="fConsentMsg">Necesitamos tu autorización para gestionar tu reserva.</span></div>
+            <div class="hp" aria-hidden="true"><label for="fWebsite">No llenar este campo</label><input id="fWebsite" tabindex="-1" autocomplete="off" /></div>
           </form>
         </div>
 
@@ -1037,10 +1054,12 @@
         <div data-step="4" hidden>
           <div class="done">
             <img src="Assets/img/logo-michi.png" alt="" />
-            <h3>¡Casi listo!</h3>
-            <p>Abrimos WhatsApp con tu solicitud. Envía el mensaje y te confirmamos tu visita y cómo pagar.</p>
+            <h3 id="doneTitle">¡Casi listo!</h3>
+            <div class="done-code" id="doneCode" hidden></div>
+            <p id="doneText">Envía el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.</p>
+            <p class="done-note" id="doneNote" hidden></p>
             <div class="btns">
-              <a class="btn btn-wa" id="doneWa" href="#" target="_blank" rel="noopener">Abrir WhatsApp de nuevo</a>
+              <a class="btn btn-wa" id="doneWa" href="#" target="_blank" rel="noopener">Enviar mensaje por WhatsApp</a>
               <button class="btn btn-ghost" id="doneIcs">Agregar a mi calendario</button>
             </div>
           </div>
@@ -1124,11 +1143,44 @@
     const earliest = () => new Date(Date.now() + S.minHoursAhead * 3600e3);
     const lastDay = () => { const t = startOfDay(new Date()); t.setDate(t.getDate() + S.maxDaysAhead); return t; };
 
+    // Horas ocupadas: las de la configuración + las que devuelve la hoja de Google
+    const API = (C.bookingApiUrl || '').trim();
+    const remoteBusy = new Set();
+    let busyLoadedAt = 0, busyLoading = null;
+    const isBusy = key => booked.has(key) || remoteBusy.has(key);
+    function loadBusy(force) {
+      if (!API) return Promise.resolve();
+      if (!force && Date.now() - busyLoadedAt < 60000) return Promise.resolve();
+      if (busyLoading) return busyLoading;
+      $('#calStatus').hidden = false;
+      busyLoading = fetch(API + '?action=busy&t=' + Date.now())
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.ok && Array.isArray(d.busy)) {
+            remoteBusy.clear();
+            d.busy.forEach(k => remoteBusy.add(String(k)));
+            busyLoadedAt = Date.now();
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          busyLoading = null;
+          $('#calStatus').hidden = true;
+          if (modal.classList.contains('open')) { if (state.step === 1) renderCalendar(); if (state.step === 2) renderSlots(); }
+        });
+      return busyLoading;
+    }
+    // En la Semana michi la hora debe estar libre los 7 días
     function slotsFor(d) {
       const out = [], min = earliest();
+      const days = state.service === 'pack' ? C.prices.weekPackDays : 1;
       for (let h = S.firstHour; h <= S.lastHour; h++) {
-        const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h);
-        out.push({ h, ok: start >= min && !booked.has(ymd(d) + ' ' + pad(h) + ':00') });
+        let free = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h) >= min;
+        for (let i = 0; free && i < days; i++) {
+          const di = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i);
+          if (isBusy(ymd(di) + ' ' + pad(h) + ':00') || blocked.has(ymd(di)) || S.closedWeekdays.includes(di.getDay())) free = false;
+        }
+        out.push({ h, ok: free });
       }
       return out;
     }
@@ -1230,15 +1282,17 @@
     }
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
+    function showAlert(msg) { const a = $('#bookAlert'); a.textContent = msg; a.hidden = false; $('#bookBody').scrollTop = 0; }
     function go(step) {
       state.step = step;
+      $('#bookAlert').hidden = true;
       $$('[data-step]').forEach(el => el.hidden = +el.dataset.step !== step);
       $$('.progress span').forEach((s, i) => s.classList.toggle('on', i < Math.min(step, 3)));
       $('#bookStepLabel').textContent = LABELS[step];
       $('#bookFoot').hidden = step === 4;
       $('#bookBack').style.visibility = step === 1 ? 'hidden' : 'visible';
       const next = $('#bookNext');
-      next.textContent = step === 3 ? 'Enviar por WhatsApp' : 'Continuar';
+      next.textContent = step === 3 ? (API ? 'Reservar mi visita' : 'Enviar por WhatsApp') : 'Continuar';
       if (step === 1) renderCalendar();
       if (step === 2) renderSlots();
       if (step === 3) renderSummary();
@@ -1259,6 +1313,7 @@
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
       go(state.step === 4 ? 1 : state.step);
+      loadBusy();
       setTimeout(() => $('#bookClose').focus(), 50);
     }
     function close() {
@@ -1281,7 +1336,12 @@
         else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
       }
     });
-    $$('input[name="svc"]').forEach(r => r.addEventListener('change', () => { state.service = r.value; }));
+    $$('input[name="svc"]').forEach(r => r.addEventListener('change', () => {
+      state.service = r.value;
+      // La disponibilidad cambia entre visita y paquete: se vuelve a elegir el día
+      state.date = null; state.hour = null;
+      renderCalendar(); updateNext();
+    }));
     $('#calPrev').addEventListener('click', () => { state.view = new Date(state.view.getFullYear(), state.view.getMonth() - 1, 1); renderCalendar(); });
     $('#calNext').addEventListener('click', () => { state.view = new Date(state.view.getFullYear(), state.view.getMonth() + 1, 1); renderCalendar(); });
     $('#calGrid').addEventListener('click', e => {
@@ -1349,32 +1409,88 @@
         if (msg) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
         if (msg && ok) { el.focus(); ok = false; }
       });
+      const consent = $('#fConsent');
+      consent.closest('.field').classList.toggle('err', !consent.checked);
+      if (!consent.checked && ok) { consent.focus(); ok = false; }
       return ok;
     }
+    $('#fConsent').addEventListener('change', e => e.target.closest('.field').classList.remove('err'));
     $('#fCats').addEventListener('change', renderSummary);
 
-    let lastMsg = '';
-    $('#bookNext').addEventListener('click', () => {
+    let lastMsg = '', sending = false;
+    const ERRORS = {
+      limite: 'Ya recibimos varias reservas desde este celular. Escríbenos por WhatsApp si necesitas otra.',
+      autorizacion: 'Necesitamos tu autorización para gestionar tu reserva.',
+      celular: 'Revisa tu número de celular.',
+      fecha: 'Ese horario ya no está disponible. Elige otro.',
+      hora: 'Ese horario ya no está disponible. Elige otro.',
+    };
+    $('#bookNext').addEventListener('click', async () => {
       if (state.step < 3) return go(state.step + 1);
-      if (!validate()) return;
+      if (sending || !validate()) return;
       const q = quote();
+      const cats = ['1', '2', '3', '4 o más'].includes($('#fCats').value) ? $('#fCats').value : '1';
+      const nt = val('fNotes').slice(0, 500);
+      let code = '', offline = false;
+
+      if (API) {
+        sending = true;
+        const btn = $('#bookNext');
+        btn.disabled = true; btn.textContent = 'Guardando tu reserva…';
+        try {
+          const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // sin "preflight" de CORS
+            body: JSON.stringify({
+              service: state.service, date: ymd(state.date), hour: state.hour, cats,
+              name: val('fName'), phone: phoneDigits($('#fPhone').value), cat: val('fCat'), address: val('fAddr'), notes: nt,
+              consent: $('#fConsent').checked, website: $('#fWebsite').value,
+              total: q.total, payNow: q.payLines[0][1], balance: q.payLines[1] ? q.payLines[1][1] : 0,
+            }),
+          });
+          const d = await res.json();
+          if (d.ok) code = d.code;
+          else if (d.error === 'tomada') {
+            await loadBusy(true);
+            state.hour = null;
+            go(2);
+            showAlert('¡Uy! Alguien acaba de reservar ese horario. Elige otra hora, por favor.');
+            return;
+          } else { showAlert(ERRORS[d.error] || 'Revisa tus datos e inténtalo de nuevo.'); return; }
+        } catch (err) {
+          offline = true; // sin conexión con la hoja: la reserva sigue por WhatsApp
+        } finally {
+          sending = false;
+          if (state.step === 3) btn.textContent = 'Reservar mi visita';
+          updateNext();
+        }
+      }
+
       const lines = ['¡Hola! 😻 Quiero agendar una visita con La nAna de los Michis.', ''];
+      if (code) lines.push('• Código de reserva: ' + code);
       q.rows.forEach(r => lines.push('• ' + r[0] + ': ' + r[1]));
       lines.push('• Valor estimado: ' + money(q.total));
       // En el mensaje escribe el cliente, así que se dice "al confirmar la visita"
       q.payLines.forEach(p => lines.push('• ' + p[0].replace('cuando te confirmemos', 'al confirmar la visita') + ': ' + money(p[1])));
       lines.push('');
       lines.push('Mis datos:');
-      const cats = ['1', '2', '3', '4 o más'].includes($('#fCats').value) ? $('#fCats').value : '1';
       lines.push('• Nombre: ' + val('fName'));
       lines.push('• Celular: ' + phoneDigits($('#fPhone').value));
       lines.push('• Michi: ' + val('fCat') + ' (' + cats + (cats === '1' ? ' gato' : ' gatos') + ')');
       lines.push('• Dirección: ' + val('fAddr'));
-      const nt = val('fNotes').slice(0, 500);
       if (nt) lines.push('• Notas: ' + nt);
       lastMsg = waLink(lines.join('\n'));
       $('#doneWa').href = lastMsg;
-      window.open(lastMsg, '_blank', 'noopener');
+
+      $('#doneCode').hidden = !code;
+      $('#doneCode').textContent = code ? 'Código ' + code : '';
+      $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
+      $('#doneText').textContent = code
+        ? 'Te guardamos este horario por ' + C.bookingHoldHours + ' horas. Último paso: envíanos el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.'
+        : 'Envía el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.';
+      $('#doneNote').hidden = !offline;
+      $('#doneNote').textContent = offline ? 'No pudimos guardar tu reserva en línea, pero con tu mensaje de WhatsApp es suficiente.' : '';
+      if (!API) window.open(lastMsg, '_blank', 'noopener');
       go(4);
     });
 
