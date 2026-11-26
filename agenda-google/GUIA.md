@@ -73,6 +73,23 @@ El **Estado** de cada reserva también se puede cambiar a mano en la hoja, con l
 
 No borren filas ni cambien el orden de las columnas: el programa las lee por posición.
 
+## Agregar otro correo (por ejemplo, el de la nAna)
+
+1. En el editor de Apps Script, cerca del inicio de `Código.gs`, busquen:
+   ```js
+   NOTIFY_EMAILS: [],
+   ```
+   y escriban el correo entre comillas (varios se separan con coma):
+   ```js
+   NOTIFY_EMAILS: ['correo.de.la.nana@gmail.com'],
+   ```
+2. Guarden y publiquen una versión nueva (ver "Si cambian el programa", abajo).
+3. Para que también pueda **ver y editar la hoja**: en la hoja, botón **Compartir** →
+   escriban su correo → rol **Editor** → **Enviar**.
+
+Los botones **Confirmar** y **Cancelar** del correo funcionan desde cualquiera de las
+cuentas que lo reciben.
+
 ## Si cambian el programa
 
 Después de editar `Codigo.gs` en el editor: **Implementar → Administrar implementaciones →

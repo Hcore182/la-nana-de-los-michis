@@ -17,7 +17,9 @@ const CONFIG = {
   MAX_DAYS_AHEAD: 120,
   PACK_DAYS: 7,            // Días de la Semana michi
   MAX_PER_PHONE: 3,        // Máximo de reservas por celular cada 30 minutos
-  NOTIFY_EMAIL: '',        // Vacío = se envía al correo de la cuenta dueña del script
+  // El correo de cada reserva llega a la cuenta dueña del script y a estos correos adicionales.
+  // Ejemplo: NOTIFY_EMAILS: ['nana@gmail.com', 'otro@gmail.com'],
+  NOTIFY_EMAILS: [],
 };
 
 const HEADERS = ['Código', 'Creada', 'Estado', 'Servicio', 'Fecha inicio', 'Hora llegada', 'Días',
@@ -235,8 +237,11 @@ function changeState_(p) {
 }
 
 function notify_(code, token, v) {
-  const to = CONFIG.NOTIFY_EMAIL || Session.getEffectiveUser().getEmail();
-  if (!to) return;
+  const list = [Session.getEffectiveUser().getEmail()].concat(CONFIG.NOTIFY_EMAILS || [])
+    .map(function (x) { return String(x || '').trim().toLowerCase(); })
+    .filter(function (x, i, a) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x) && a.indexOf(x) === i; });
+  if (!list.length) return;
+  const to = list.join(',');
   const url = ScriptApp.getService().getUrl();
   const link = function (a) { return url + '?action=' + a + '&code=' + encodeURIComponent(code) + '&token=' + token; };
   const money = function (n) { return '$' + Number(n).toLocaleString('es-CO'); };
