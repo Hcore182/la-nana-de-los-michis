@@ -5,3 +5,6 @@ node_modules/
 Thumbs.db
 .vscode/
 .claude/settings.local.json
+
+# Fotos originales (en la página se usan las versiones editadas de Assets/img)
+Assets/Fmly*.jpg
