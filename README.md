@@ -1,6 +1,6 @@
 # La nAna de los Michis
 
-Landing de cuidado de gatos a domicilio en Fusagasugá, con agenda de visitas de 1 hora.
+Landing de cuidado de gatos a domicilio en Fusagasugá, con agenda de visitas.
 
 ## Cómo verla
 Abre `index.html` en el navegador. No necesita instalar nada.
