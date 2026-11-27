@@ -32,7 +32,7 @@
     // ── Reservas en Google Sheets (ver agenda-google/GUIA.md) ─────────
     // Pega aquí la URL de la aplicación web de Apps Script. Vacío = solo WhatsApp.
     bookingApiUrl: "https://script.google.com/macros/s/AKfycbwmNIAd952WuJbLm0KCdbyEfLavLZY2Uum1vbXgyZubZPLpgwzlDiNiZkcD5o4NaC7u/exec",
-    bookingHoldHours: 3,   // Horas que se guarda una reserva pendiente
+    bookingHoldHours: 1,   // Horas que se guarda una reserva pendiente (igual que PENDING_HOURS en Codigo.gs)
 
     // ── Precios (salen de la calculadora de tarifas) ──────────────────
     prices: {
@@ -1093,6 +1093,7 @@
       return hh + ':00 ' + (h < 12 ? 'a. m.' : 'p. m.');
     };
     const icsText = s => s.replace(/[\\;,]/g, m => '\\' + m); // escapa texto para el archivo .ics
+    const holdText = () => C.bookingHoldHours === 1 ? '1 hora' : C.bookingHoldHours + ' horas';
     const waLink = text => 'https://wa.me/' + C.whatsappNumber + (text ? '?text=' + encodeURIComponent(text) : '');
 
     /* ── Rellenar datos desde la configuración ── */
@@ -1328,7 +1329,7 @@
     function close(force) {
       if (force !== true && state.step === 4 && !waSent && !closeWarned) {
         closeWarned = true;
-        showAlert('Falta un paso: envíanos el mensaje por WhatsApp para confirmar tu visita. Si no lo envías, el horario se libera en ' + C.bookingHoldHours + ' horas.');
+        showAlert('Falta un paso: envíanos el mensaje por WhatsApp para confirmar tu visita. Si no lo envías, el horario se libera en ' + holdText() + '.');
         $('#doneWa').focus();
         return;
       }
@@ -1501,7 +1502,7 @@
       $('#doneCode').textContent = code ? 'Código ' + code : '';
       $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
       $('#doneText').textContent = code
-        ? 'Te guardamos este horario por ' + C.bookingHoldHours + ' horas. Último paso: envíanos el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.'
+        ? 'Te guardamos este horario por ' + holdText() + '. Último paso: envíanos el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.'
         : 'Envía el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.';
       $('#doneNote').hidden = !offline;
       $('#doneNote').textContent = offline ? 'No pudimos guardar tu reserva en línea, pero con tu mensaje de WhatsApp es suficiente.' : '';

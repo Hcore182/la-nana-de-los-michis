@@ -63,12 +63,12 @@ Suban el cambio a GitHub y listo.
 |---|---|
 | Llega una reserva | Les llega un correo "😻 Nueva reserva LNM-XXXX". La hora queda bloqueada como **pendiente**. |
 | El cliente paga y envía el comprobante por WhatsApp | Busquen el código `LNM-XXXX` del mensaje en su correo y pulsen **✅ Confirmar**. |
-| El cliente no paga | No hagan nada: a las **3 horas** pasa sola a **vencida** y la hora se libera. |
+| El cliente no paga | No hagan nada: a la **1 hora** pasa sola a **vencida** y la hora se libera. |
 | El cliente cancela | Pulsen **❌ Cancelar** en el correo, o cambien el estado en la hoja. |
 | Quieren ver la agenda | Abran la hoja (también funciona en la app de Google Sheets del celular) y filtren por fecha. |
 
 El **Estado** de cada reserva también se puede cambiar a mano en la hoja, con la lista desplegable:
-`pendiente`, `confirmada`, `cancelada`, `vencida`. Solo `pendiente` (menos de 3 horas) y
+`pendiente`, `confirmada`, `cancelada`, `vencida`. Solo `pendiente` (menos de 1 hora) y
 `confirmada` bloquean la hora.
 
 No borren filas ni cambien el orden de las columnas: el programa las lee por posición.

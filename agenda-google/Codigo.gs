@@ -11,7 +11,7 @@
 // ── Configuración ────────────────────────────────────────────────────────
 const CONFIG = {
   SHEET_NAME: 'Reservas',
-  PENDING_HOURS: 3,        // Las pendientes bloquean la hora y se vencen a las 3 horas
+  PENDING_HOURS: 1,        // Las pendientes bloquean la hora y se vencen a la hora
   FIRST_HOUR: 6,           // Igual que en la página (schedule.firstHour)
   LAST_HOUR: 20,           // Igual que en la página (schedule.lastHour)
   MAX_DAYS_AHEAD: 120,
@@ -260,7 +260,7 @@ function notify_(code, token, v) {
     subject: '😻 Nueva reserva ' + code + ' · ' + v.date + ' ' + pad_(v.hour) + ':00 · ' + v.name,
     htmlBody: '<div style="font-family:Arial,sans-serif;color:#5B3A3F">' +
       '<h2 style="margin:0 0 8px">Nueva reserva ' + code + ' (pendiente)</h2>' +
-      '<p>Se vence sola en ' + CONFIG.PENDING_HOURS + ' horas si no la confirmas.</p>' +
+      '<p>Se vence sola en ' + (CONFIG.PENDING_HOURS === 1 ? '1 hora' : CONFIG.PENDING_HOURS + ' horas') + ' si no la confirmas.</p>' +
       '<table>' + rows + '</table>' +
       '<p style="margin-top:16px">Cuando el cliente te envíe el comprobante por WhatsApp:</p>' +
       btn(link('confirm'), '✅ Confirmar', '#2E9E5B') + btn(link('cancel'), '❌ Cancelar', '#B9506B') +
