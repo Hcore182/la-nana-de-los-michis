@@ -1319,8 +1319,7 @@
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
     function showAlert(msg) { const a = $('#bookAlert'); a.textContent = msg; a.hidden = false; $('#bookBody').scrollTop = 0; }
-    const RESERVE_HTML = () => '<span class="cta-ico" aria-hidden="true">😻</span><span class="cta-txt"><b>¡Reservar mi visita!</b>' +
-      '<small>' + (API ? 'Te guardamos el horario ' + holdText() : 'Te llevamos a WhatsApp') + '</small></span><span class="cta-heart" aria-hidden="true">💕</span>';
+    const RESERVE_HTML = () => '<span class="cta-ico" aria-hidden="true">😻</span><span class="cta-txt"><b>¡Reservar mi visita!</b></span><span class="cta-heart" aria-hidden="true">💕</span>';
     function setNextLabel(step) {
       const next = $('#bookNext');
       next.classList.toggle('btn-reserve', step === 3);
