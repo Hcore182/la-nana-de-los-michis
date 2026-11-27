@@ -108,6 +108,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
     html { scroll-behavior: smooth; scroll-padding-top: 84px; }
     body {
       font-family: 'Nunito', system-ui, sans-serif;
@@ -643,6 +644,8 @@
     .done h3 { font-family: 'Fredoka', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
     .done p { color: var(--cocoa-sub); margin-bottom: 18px; }
     .done .btns { display: flex; flex-direction: column; gap: 10px; }
+    .done-after { display: flex; flex-direction: column; gap: 10px; }
+    .done-sent { margin: 4px 0 2px !important; padding: 10px 14px; border-radius: 12px; background: #E9F7EF; color: #1E6B43; font-size: 14px; font-weight: 700; }
 
     /* ─── Responsive ────────────────────────────────────────── */
     @media (max-width: 1024px) {
@@ -1060,7 +1063,11 @@
             <p class="done-note" id="doneNote" hidden></p>
             <div class="btns">
               <a class="btn btn-wa" id="doneWa" href="#" target="_blank" rel="noopener">Enviar mensaje por WhatsApp</a>
-              <button class="btn btn-ghost" id="doneIcs">Agregar a mi calendario</button>
+              <div class="done-after" id="doneAfter" hidden>
+                <p class="done-sent">✓ ¡Gracias! Cuando recibamos tu mensaje te confirmamos tu visita por WhatsApp.</p>
+                <button class="btn btn-ghost" id="doneIcs">Agregar a mi calendario</button>
+                <button class="btn btn-ghost" id="doneClose">Cerrar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1316,7 +1323,15 @@
       loadBusy();
       setTimeout(() => $('#bookClose').focus(), 50);
     }
-    function close() {
+    // En la pantalla final, si no ha abierto WhatsApp, el primer intento de cerrar solo avisa
+    let waSent = true, closeWarned = false;
+    function close(force) {
+      if (force !== true && state.step === 4 && !waSent && !closeWarned) {
+        closeWarned = true;
+        showAlert('Falta un paso: envíanos el mensaje por WhatsApp para confirmar tu visita. Si no lo envías, el horario se libera en ' + C.bookingHoldHours + ' horas.');
+        $('#doneWa').focus();
+        return;
+      }
       modal.classList.remove('open');
       document.body.style.overflow = '';
       if (lastFocus) lastFocus.focus();
@@ -1490,9 +1505,18 @@
         : 'Envía el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.';
       $('#doneNote').hidden = !offline;
       $('#doneNote').textContent = offline ? 'No pudimos guardar tu reserva en línea, pero con tu mensaje de WhatsApp es suficiente.' : '';
+      waSent = false; closeWarned = false;
+      $('#doneAfter').hidden = true;
       if (!API) window.open(lastMsg, '_blank', 'noopener');
       go(4);
     });
+
+    $('#doneWa').addEventListener('click', () => {
+      waSent = true;
+      $('#bookAlert').hidden = true;
+      $('#doneAfter').hidden = false;
+    });
+    $('#doneClose').addEventListener('click', () => close(true));
 
     /* Archivo .ics para agregar al calendario del cliente */
     $('#doneIcs').addEventListener('click', () => {
