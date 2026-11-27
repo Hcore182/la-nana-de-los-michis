@@ -1392,14 +1392,15 @@
       const deposit = isPack ? Math.ceil(total * P.depositPct / 100 / 1000) * 1000 : total;
       const payLines = isPack
         ? [['Anticipo para confirmar (' + P.depositPct + '%)', deposit], ['Saldo en la visita previa', total - deposit]]
-        : [['Pago para confirmar', total]];
-      return { rows, total, deposit, payLines };
+        : []; // la visita suelta se paga completa: basta con el valor total
+      const totalLabel = isPack ? 'Valor del paquete' : 'Valor de la visita';
+      return { rows, total, deposit, payLines, totalLabel };
     }
 
     function renderSummary() {
       const q = quote();
       $('#summary').innerHTML = q.rows.map(r => '<div class="summary-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('') +
-        '<div class="summary-row total"><span>Valor estimado</span><span>' + money(q.total) + '</span></div>' +
+        '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
         q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
         '<small>' + (state.service === 'pack'
           ? 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos para el anticipo y, cuando lo pagues, tus visitas quedan confirmadas. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
@@ -1586,7 +1587,7 @@
               service: state.service, date: ymd(state.date), hour: state.hour, cats,
               name: val('fName'), phone: phoneDigits($('#fPhone').value), cat: val('fCat'), address: val('fAddr'), notes: nt,
               consent: $('#fConsent').checked, website: $('#fWebsite').value,
-              total: q.total, payNow: q.payLines[0][1], balance: q.payLines[1] ? q.payLines[1][1] : 0,
+              total: q.total, payNow: q.deposit, balance: q.total - q.deposit,
             }),
           });
           const d = await res.json();
@@ -1610,7 +1611,7 @@
       const lines = ['¡Hola! 😻 Quiero agendar una visita con La nAna de los Michis.', ''];
       if (code) lines.push('• Código de reserva: ' + code);
       q.rows.forEach(r => lines.push('• ' + r[0] + ': ' + r[1]));
-      lines.push('• Valor estimado: ' + money(q.total));
+      lines.push('• ' + q.totalLabel + ': ' + money(q.total));
       q.payLines.forEach(p => lines.push('• ' + p[0] + ': ' + money(p[1])));
       lines.push('');
       lines.push('Mis datos:');
