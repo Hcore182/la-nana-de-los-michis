@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /agenda-google/
+
+Sitemap: https://lananadelosmichis.com/sitemap.xml
