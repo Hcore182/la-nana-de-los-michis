@@ -550,6 +550,30 @@
     .sheet-foot { padding: 14px 24px 20px; border-top: 1px solid var(--line); display: flex; gap: 10px; justify-content: space-between; align-items: center; background: #fff; }
     .sheet-foot .btn { padding: 13px 26px; font-size: 15px; }
     .sheet-foot .btn[disabled] { opacity: .45; pointer-events: none; animation: none; }
+    /* Botón final para reservar: rosa intenso a coral, con gatito, corazón y brillo */
+    .sheet-foot .btn-reserve {
+      flex: 1; justify-content: center; gap: 12px; padding: 10px 20px 10px 12px; min-height: 58px;
+      background: linear-gradient(120deg, #A8405E 0%, #CF4F75 45%, #E8706A 100%);
+      background-size: 200% 100%; color: #fff; text-align: left;
+      box-shadow: 0 10px 26px rgba(185,80,107,.45), inset 0 -2px 0 rgba(0,0,0,.12);
+      animation: reserveGlow 2.4s ease-in-out infinite, reserveSlide 6s ease-in-out infinite;
+    }
+    .sheet-foot .btn-reserve:hover { transform: translateY(-3px) scale(1.02); filter: brightness(1.06); }
+    @keyframes reserveGlow {
+      0%,100% { box-shadow: 0 10px 26px rgba(185,80,107,.45), inset 0 -2px 0 rgba(0,0,0,.12); }
+      50%      { box-shadow: 0 14px 34px rgba(207,79,117,.62), 0 0 0 7px rgba(232,112,106,.16), inset 0 -2px 0 rgba(0,0,0,.12); }
+    }
+    @keyframes reserveSlide { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .btn-reserve .cta-ico { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: rgba(255,255,255,.95); display: grid; place-items: center; font-size: 22px; box-shadow: 0 2px 6px rgba(0,0,0,.12); animation: ctaBounce 2.4s ease-in-out infinite; }
+    @keyframes ctaBounce { 0%,100% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-3px) rotate(-8deg); } 60% { transform: translateY(0) rotate(6deg); } }
+    .btn-reserve .cta-txt { display: flex; flex-direction: column; line-height: 1.15; }
+    .sheet-foot .btn-reserve::after { display: none; }
+    #bookBack { gap: 6px; }
+    .btn-reserve .cta-txt b, .btn-reserve .cta-txt small { white-space: nowrap; }
+    .btn-reserve .cta-txt b { font-family: 'Fredoka', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: .2px; }
+    .btn-reserve .cta-txt small { font-size: 12px; font-weight: 700; opacity: .92; }
+    .btn-reserve .cta-heart { margin-left: auto; font-size: 18px; animation: heartBeat 1.2s ease-in-out infinite; }
+    @keyframes heartBeat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.18); } }
     .step-title { font-weight: 800; font-size: 17px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
     .services { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
@@ -686,6 +710,10 @@
       .footer-inner { flex-direction: column; text-align: center; }
     }
     @media (max-width: 560px) {
+      #bookBack { width: 50px; height: 50px; padding: 0; flex-shrink: 0; font-size: 20px; }
+      #bookBack .back-txt { display: none; }
+      .sheet-foot .btn-reserve { padding: 8px 14px 8px 10px; gap: 10px; }
+      .btn-reserve .cta-txt b { font-size: 17px; }
       .plan { padding: 30px 20px 24px; }
       .plan .price { font-size: clamp(34px, 9.5vw, 46px); }
       .section { padding: 68px 16px; }
@@ -1074,7 +1102,7 @@
       </div>
 
       <div class="sheet-foot" id="bookFoot">
-        <button class="btn btn-ghost" id="bookBack">Atrás</button>
+        <button class="btn btn-ghost" id="bookBack" aria-label="Atrás"><span aria-hidden="true">←</span><span class="back-txt">Atrás</span></button>
         <button class="btn btn-book" id="bookNext" disabled>Continuar</button>
       </div>
     </div>
@@ -1291,6 +1319,13 @@
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
     function showAlert(msg) { const a = $('#bookAlert'); a.textContent = msg; a.hidden = false; $('#bookBody').scrollTop = 0; }
+    const RESERVE_HTML = () => '<span class="cta-ico" aria-hidden="true">😻</span><span class="cta-txt"><b>¡Reservar mi visita!</b>' +
+      '<small>' + (API ? 'Te guardamos el horario ' + holdText() : 'Te llevamos a WhatsApp') + '</small></span><span class="cta-heart" aria-hidden="true">💕</span>';
+    function setNextLabel(step) {
+      const next = $('#bookNext');
+      next.classList.toggle('btn-reserve', step === 3);
+      if (step === 3) next.innerHTML = RESERVE_HTML(); else next.textContent = 'Continuar';
+    }
     function go(step) {
       state.step = step;
       $('#bookAlert').hidden = true;
@@ -1300,7 +1335,7 @@
       $('#bookFoot').hidden = step === 4;
       $('#bookBack').style.visibility = step === 1 ? 'hidden' : 'visible';
       const next = $('#bookNext');
-      next.textContent = step === 3 ? (API ? 'Reservar mi visita' : 'Enviar por WhatsApp') : 'Continuar';
+      setNextLabel(step);
       if (step === 1) renderCalendar();
       if (step === 2) renderSlots();
       if (step === 3) renderSummary();
@@ -1397,7 +1432,7 @@
       fPhone: { phone: true,
                 check: v => !v ? 'Escribe tu celular.' : (!/^3\d{9}$/.test(v) ? 'Escribe un celular de 10 dígitos que empiece por 3.' : '') },
       fAddr:  { allow: /[^\p{L}\p{M}\p{N} #°º.,\/()-]/gu, max: 120,
-                check: v => v.length < 4 ? 'Necesitamos saber a dónde ir.' : (!/\p{L}/u.test(v) ? 'Escribe el barrio o la dirección.' : '') },
+                check: v => v.length < 4 ? 'Necesitamos saber a dónde ir para consentir a tu michi.' : (!/\p{L}/u.test(v) ? 'Escribe el barrio o la dirección.' : '') },
     };
     const val = id => clean($('#' + id).value);
     // Mientras escriben: se descartan los caracteres que no aplican a cada campo
@@ -1452,7 +1487,7 @@
       if (API) {
         sending = true;
         const btn = $('#bookNext');
-        btn.disabled = true; btn.textContent = 'Guardando tu reserva…';
+        btn.disabled = true; btn.innerHTML = '<span class="cta-ico" aria-hidden="true">⏳</span><span class="cta-txt"><b>Guardando tu reserva…</b><small>Un momento, por favor</small></span>';
         try {
           const res = await fetch(API, {
             method: 'POST',
@@ -1477,7 +1512,7 @@
           offline = true; // sin conexión con la hoja: la reserva sigue por WhatsApp
         } finally {
           sending = false;
-          if (state.step === 3) btn.textContent = 'Reservar mi visita';
+          if (state.step === 3) setNextLabel(3);
           updateNext();
         }
       }
