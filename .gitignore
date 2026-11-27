@@ -8,3 +8,6 @@ Thumbs.db
 
 # Fotos originales (en la página se usan las versiones editadas de Assets/img)
 Assets/Fmly*.jpg
+
+# Versión con correos reales para pegar en Apps Script (no se publica)
+agenda-google/*.local.gs

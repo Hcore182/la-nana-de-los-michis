@@ -84,6 +84,8 @@ No borren filas ni cambien el orden de las columnas: el programa las lee por pos
    NOTIFY_EMAILS: ['correo.de.la.nana@gmail.com'],
    ```
 2. Guarden y publiquen una versión nueva (ver "Si cambian el programa", abajo).
+   Para no publicar el correo en GitHub, guarden esa versión como `Codigo.local.gs`
+   (Git la ignora) y peguen ese archivo en Apps Script.
 3. Para que también pueda **ver y editar la hoja**: en la hoja, botón **Compartir** →
    escriban su correo → rol **Editor** → **Enviar**.
 
