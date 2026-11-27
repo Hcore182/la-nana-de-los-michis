@@ -2,6 +2,8 @@
 
 Landing de cuidado de gatos a domicilio en Fusagasugá, con agenda de visitas.
 
+Página publicada en **https://lananadelosmichis.com** (GitHub Pages; dominio en Cloudflare).
+
 ## Cómo verla
 Abre `index.html` en el navegador. No necesita instalar nada.
 
