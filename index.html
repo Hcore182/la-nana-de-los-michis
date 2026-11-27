@@ -673,6 +673,8 @@
     .done img { width: 150px; margin: 0 auto 12px; animation: catFloat 4s ease-in-out infinite; }
     .done h3 { font-family: 'Fredoka', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
     .done p { color: var(--cocoa-sub); margin-bottom: 18px; }
+    .done-step { display: block; margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FFF4E0; border: 1.5px solid #F3C98B; color: var(--cocoa); font-size: 15px; line-height: 1.5; text-align: left; }
+    .done-step b { color: var(--pink-dark); }
     .done .btns { display: flex; flex-direction: column; gap: 10px; }
     .done-after { display: flex; flex-direction: column; gap: 10px; }
     .done-sent { margin: 4px 0 2px !important; padding: 10px 14px; border-radius: 12px; background: #E9F7EF; color: #1E6B43; font-size: 14px; font-weight: 700; }
@@ -1557,9 +1559,9 @@
       $('#doneCode').hidden = !code;
       $('#doneCode').textContent = code ? 'Código ' + code : '';
       $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
-      $('#doneText').textContent = code
-        ? 'Te guardamos este horario por ' + holdText() + '. Último paso: envíanos el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.'
-        : 'Envía el mensaje por WhatsApp y te confirmamos tu visita y cómo pagar.';
+      // Texto fijo (sin datos del cliente), por eso se puede usar innerHTML
+      $('#doneText').innerHTML = (code ? 'Te guardamos este horario por ' + holdText() + '.' : '') +
+        '<span class="done-step">👉 <b>Último paso:</b> pulsa el botón verde, envíanos el mensaje por WhatsApp y luego <b>vuelve a esta página</b>.</span>';
       $('#doneNote').hidden = !offline;
       $('#doneNote').textContent = offline ? 'No pudimos guardar tu reserva en línea, pero con tu mensaje de WhatsApp es suficiente.' : '';
       waSent = false; closeWarned = false;
