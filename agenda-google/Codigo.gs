@@ -116,7 +116,11 @@ function doPost(e) {
     row[COL['Notas']] = v.notes;
     row[COL['Autorizó datos']] = 'sí · ' + now;
     row[COL['Clave interna']] = token;
-    sheet_().appendRow(row.map(safeCell_));
+    // Se escribe como texto para que Sheets no convierta fechas ni horas
+    const shw = sheet_();
+    const target = shw.getRange(shw.getLastRow() + 1, 1, 1, HEADERS.length);
+    target.setNumberFormat('@');
+    target.setValues([row.map(safeCell_)]);
     cache.put(rlKey, String(count + 1), 1800);
     SpreadsheetApp.flush();
     notify_(code, token, v);
@@ -129,30 +133,69 @@ function doPost(e) {
 // ── Vencer pendientes (lo ejecuta el activador cada 15 minutos) ──────────
 function expirePending() {
   const sh = sheet_();
-  const rows = sh.getDataRange().getDisplayValues();
   const limit = Date.now() - CONFIG.PENDING_HOURS * 3600 * 1000;
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i][COL['Estado']] === 'pendiente' && parseLocal_(rows[i][COL['Creada']]) < limit) {
-      sh.getRange(i + 1, COL['Estado'] + 1).setValue('vencida');
+  readRows_().forEach(function (r) {
+    // Si no se puede leer la fecha de creación, no se vence (mejor bloquear de más)
+    if (r.state === 'pendiente' && r.created > 0 && r.created < limit) {
+      sh.getRange(r.row, COL['Estado'] + 1).setValue('vencida');
     }
-  }
+  });
 }
 
 // ── Lógica interna ───────────────────────────────────────────────────────
 function busySlots_() {
-  const rows = sheet_().getDataRange().getDisplayValues();
   const limit = Date.now() - CONFIG.PENDING_HOURS * 3600 * 1000;
   const out = [];
-  for (let i = 1; i < rows.length; i++) {
-    const r = rows[i];
-    const st = r[COL['Estado']];
-    const active = st === 'confirmada' || (st === 'pendiente' && parseLocal_(r[COL['Creada']]) >= limit);
-    if (!active) continue;
-    const hour = parseInt(String(r[COL['Hora llegada']]).slice(0, 2), 10);
-    const days = parseInt(r[COL['Días']], 10) || 1;
-    slotKeys_(r[COL['Fecha inicio']], hour, days).forEach(function (k) { out.push(k); });
+  readRows_().forEach(function (r) {
+    // Pendiente sin fecha de creación legible: se bloquea igual (mejor bloquear de más)
+    const active = r.state === 'confirmada' || (r.state === 'pendiente' && (r.created === 0 || r.created >= limit));
+    if (!active) return;
+    slotKeys_(r.date, r.hour, r.days).forEach(function (k) { out.push(k); });
+  });
+  return out;
+}
+
+// Lee la hoja aunque Sheets haya convertido textos en fechas u horas
+function readRows_() {
+  const rng = sheet_().getDataRange();
+  const vals = rng.getValues();
+  const disp = rng.getDisplayValues();
+  const out = [];
+  for (let i = 1; i < disp.length; i++) {
+    const d = disp[i], v = vals[i];
+    if (!String(d[COL['Código']]).trim()) continue;
+    out.push({
+      row: i + 1, disp: d,
+      state: String(d[COL['Estado']]).trim().toLowerCase(),
+      created: isDate_(v[COL['Creada']]) ? v[COL['Creada']].getTime() : parseLocal_(d[COL['Creada']]),
+      date: dateOf_(v[COL['Fecha inicio']], d[COL['Fecha inicio']]),
+      hour: hourOf_(d[COL['Hora llegada']]),
+      days: parseInt(d[COL['Días']], 10) || 1,
+    });
   }
   return out;
+}
+function isDate_(x) { return Object.prototype.toString.call(x) === '[object Date]' && !isNaN(x.getTime()); }
+// "2026-11-28", "2026-11-28" convertido en fecha, o "28/11/2026" -> "2026-11-28"
+function dateOf_(val, text) {
+  if (isDate_(val)) return Utilities.formatDate(val, tz_(), 'yyyy-MM-dd');
+  const t = String(text).trim();
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(t);
+  if (m) return m[1] + '-' + pad_(Number(m[2])) + '-' + pad_(Number(m[3]));
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(t);
+  if (m) return m[3] + '-' + pad_(Number(m[2])) + '-' + pad_(Number(m[1]));
+  return t;
+}
+// "08:00", "8:00", "8:00:00" o "8:00 p. m." -> 8 o 20 (se usa el texto visible:
+// el valor interno de una hora sin fecha puede correrse unos minutos)
+function hourOf_(text) {
+  const t = String(text).trim().toLowerCase();
+  const m = /^(\d{1,2})(?::\d{2})?/.exec(t);
+  if (!m) return NaN;
+  let h = Number(m[1]);
+  if (/p\.?\s*m/.test(t) && h < 12) h += 12;
+  if (/a\.?\s*m/.test(t) && h === 12) h = 0;
+  return h;
 }
 
 // "2026-12-05 08:00" para cada día que ocupa la reserva
@@ -213,16 +256,16 @@ function safeCell_(x) {
 function changeState_(p) {
   const target = p.action === 'confirm' ? 'confirmada' : 'cancelada';
   const sh = sheet_();
-  const rows = sh.getDataRange().getDisplayValues();
-  for (let i = 1; i < rows.length; i++) {
-    const r = rows[i];
+  const all = readRows_();
+  for (let n = 0; n < all.length; n++) {
+    const row = all[n], r = row.disp, i = row.row - 1;
     if (r[COL['Código']] !== p.code) continue;
     if (!p.token || r[COL['Clave interna']] !== p.token) break;
     let note = '';
-    if (target === 'confirmada' && r[COL['Estado']] === 'vencida') {
+    if (target === 'confirmada' && row.state === 'vencida') {
       // Revisar que nadie haya tomado la hora mientras estaba vencida
       const busy = busySlots_();
-      const mine = slotKeys_(r[COL['Fecha inicio']], parseInt(r[COL['Hora llegada']], 10), parseInt(r[COL['Días']], 10) || 1);
+      const mine = slotKeys_(row.date, row.hour, row.days);
       if (mine.some(function (k) { return busy.indexOf(k) !== -1; })) {
         return page_('⚠️ No se pudo confirmar', 'La reserva ' + p.code + ' se había vencido y otra persona ya tomó ese horario. Escríbele al cliente para ofrecerle otra hora.');
       }
@@ -282,7 +325,7 @@ function sheet_() {
 function tz_() { return Session.getScriptTimeZone() || 'America/Bogota'; }
 function pad_(n) { return (n < 10 ? '0' : '') + n; }
 function parseLocal_(s) {
-  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/.exec(String(s));
+  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})/.exec(String(s).trim());
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5])).getTime() : 0;
 }
 function json_(obj) {
