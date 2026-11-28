@@ -676,7 +676,7 @@
     .first-box input { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; accent-color: var(--pink-deep); }
     .first-box b { display: block; font-size: 15px; color: var(--cocoa); }
     .first-box > span { line-height: 1.35; }
-    .first-box span span { display: block; margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--cocoa-sub); }
+    .first-teaser { font-style: normal; font-weight: 700; font-size: 13px; color: var(--pink-dark); white-space: nowrap; }
     .first-steps { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #F3C98B; font-size: 14px; line-height: 1.5; color: var(--cocoa-sub); animation: stepsIn .35s ease; }
     @keyframes stepsIn { from { opacity: 0; transform: translateY(-6px); } }
     .first-steps .fs-title { font-weight: 800; color: var(--cocoa); margin-bottom: 6px; }
@@ -1131,7 +1131,7 @@
         <!-- Paso 3: datos -->
         <div data-step="3" hidden>
           <div class="first-wrap" id="firstWrap">
-            <label class="first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span id="firstHint">Primero nos reunimos para conocernos, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo; si no, no pagas nada.</span></span></label>
+            <label class="first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis <em class="first-teaser" id="firstHint">· conócenos sin costo</em></b></span></label>
             <div class="first-steps" id="firstSteps" hidden>
               <p class="fs-title">¡Bienvenido! Así funciona tu primera vez:</p>
               <ol>
