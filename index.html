@@ -1427,7 +1427,7 @@
         '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
         q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
         '<small>' + (q.first
-          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>: primero nos reunimos contigo, sin costo, para conocer a tu michi y resolver tus dudas. <b>Solo si te sientes en confianza, confirmas y pagas la visita de tu michi ahí mismo</b>, con nosotros presentes; si no, no pagas nada. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
+          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
           : state.service === 'pack'
           ? 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos para el anticipo y, cuando lo pagues, tus visitas quedan confirmadas. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
           : 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos de pago y, cuando pagues, tu visita queda confirmada. ') +
