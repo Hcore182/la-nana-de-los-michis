@@ -670,11 +670,19 @@
     .cal-status { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--cocoa-light); }
     .done-code { display: inline-block; margin: 0 0 14px; padding: 8px 16px; border-radius: 12px; background: var(--pink-mist); border: 1.5px dashed var(--pink); font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 600; color: var(--pink-dark); letter-spacing: 1px; }
     .done-note { font-size: 13px; color: var(--cocoa-light); }
-    .first-box { display: flex; flex-direction: row; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: #FFF4E0; border: 1.5px solid #F3C98B; cursor: pointer; }
+    .first-wrap { margin-bottom: 16px; padding: 14px 16px; border-radius: 16px; background: #FFF4E0; border: 1.5px solid #F3C98B; transition: box-shadow var(--t); }
+    .first-wrap.on { box-shadow: 0 6px 20px rgba(224,161,90,.25); }
+    .first-box { display: flex; flex-direction: row; gap: 12px; align-items: flex-start; cursor: pointer; }
     .first-box input { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; accent-color: var(--pink-deep); }
     .first-box b { display: block; font-size: 15px; color: var(--cocoa); }
     .first-box > span { line-height: 1.35; }
     .first-box span span { display: block; margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--cocoa-sub); }
+    .first-steps { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #F3C98B; font-size: 14px; line-height: 1.5; color: var(--cocoa-sub); animation: stepsIn .35s ease; }
+    @keyframes stepsIn { from { opacity: 0; transform: translateY(-6px); } }
+    .first-steps .fs-title { font-weight: 800; color: var(--cocoa); margin-bottom: 6px; }
+    .first-steps ol { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .first-steps ol b { color: var(--pink-dark); }
+    .first-steps .fs-guarantee { margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: #fff; font-weight: 700; color: var(--cocoa); }
     .trust-strip { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .trust-item { display: flex; gap: 14px; align-items: flex-start; background: var(--white); border: 1.5px dashed var(--pink); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-soft); }
     .trust-item .ico { font-size: 28px; line-height: 1; }
@@ -1122,9 +1130,20 @@
 
         <!-- Paso 3: datos -->
         <div data-step="3" hidden>
+          <div class="first-wrap" id="firstWrap">
+            <label class="first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span id="firstHint">Primero nos reunimos para conocernos, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo; si no, no pagas nada.</span></span></label>
+            <div class="first-steps" id="firstSteps" hidden>
+              <p class="fs-title">¡Bienvenido! Así funciona tu primera vez:</p>
+              <ol>
+                <li>Te guardamos el horario por <span data-hold>1 hora</span>.</li>
+                <li>Te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>, sin costo.</li>
+                <li><b>Solo si te sientes en confianza</b>, pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada.</li>
+              </ol>
+              <p class="fs-guarantee">💕 Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero.</p>
+            </div>
+          </div>
           <div class="summary" id="summary"></div>
           <form class="form-grid" id="bookForm" novalidate>
-            <label class="field full first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span>Primero nos reunimos para conocernos, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo; si no, no pagas nada.</span></span></label>
             <div class="field"><label for="fCats">¿Cuántos gatos?</label><select id="fCats"><option>1</option><option>2</option><option>3</option><option>4 o más</option></select></div>
             <div class="field"><label for="fCat">Nombre de tu michi</label><input id="fCat" maxlength="60" autocomplete="off" autocapitalize="words" required aria-describedby="fCatMsg" /><span class="msg" id="fCatMsg"></span></div>
             <div class="field"><label for="fName">Tu nombre</label><input id="fName" maxlength="60" autocomplete="name" autocapitalize="words" required aria-describedby="fNameMsg" /><span class="msg" id="fNameMsg"></span></div>
@@ -1427,7 +1446,7 @@
         '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
         q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
         '<small>' + (q.first
-          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
+          ? ''
           : state.service === 'pack'
           ? 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos para el anticipo y, cuando lo pagues, tus visitas quedan confirmadas. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
           : 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos de pago y, cuando pagues, tu visita queda confirmada. ') +
@@ -1584,7 +1603,13 @@
     }
     $('#fConsent').addEventListener('change', e => e.target.closest('.field').classList.remove('err'));
     $('#fCats').addEventListener('change', renderSummary);
-    $('#fFirst').addEventListener('change', renderSummary);
+    $('#fFirst').addEventListener('change', () => {
+      const on = $('#fFirst').checked;
+      $('#firstSteps').hidden = !on;
+      $('#firstHint').hidden = on;
+      $('#firstWrap').classList.toggle('on', on);
+      renderSummary();
+    });
 
     let lastMsg = '', sending = false;
     const ERRORS = {
