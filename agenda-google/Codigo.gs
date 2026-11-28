@@ -24,7 +24,7 @@ const CONFIG = {
 
 const HEADERS = ['Código', 'Creada', 'Estado', 'Servicio', 'Fecha inicio', 'Hora llegada', 'Días',
   'Gatos', 'Valor estimado', 'Pago al confirmar', 'Saldo', 'Nombre', 'Celular', 'Michi',
-  'Dirección', 'Notas', 'Autorizó datos', 'Clave interna'];
+  'Dirección', 'Notas', 'Autorizó datos', 'Clave interna', 'Primera vez'];
 const COL = {};
 HEADERS.forEach(function (h, i) { COL[h] = i; });
 const STATES = ['pendiente', 'confirmada', 'cancelada', 'vencida'];
@@ -116,8 +116,12 @@ function doPost(e) {
     row[COL['Notas']] = v.notes;
     row[COL['Autorizó datos']] = 'sí · ' + now;
     row[COL['Clave interna']] = token;
+    row[COL['Primera vez']] = v.firstTime ? 'sí' : 'no';
     // Se escribe como texto para que Sheets no convierta fechas ni horas
     const shw = sheet_();
+    // Hojas creadas antes de agregar la columna 'Primera vez': se escribe su encabezado
+    const lastHeader = shw.getRange(1, HEADERS.length);
+    if (!String(lastHeader.getValue()).trim()) lastHeader.setValue(HEADERS[HEADERS.length - 1]).setFontWeight('bold').setBackground('#F8D3DA').setFontColor('#5B3A3F');
     const target = shw.getRange(shw.getLastRow() + 1, 1, 1, HEADERS.length);
     target.setNumberFormat('@');
     target.setValues([row.map(safeCell_)]);
@@ -241,6 +245,7 @@ function validate_(d) {
     service: service, date: String(d.date), hour: hour, days: service === 'pack' ? CONFIG.PACK_DAYS : 1,
     cats: cats, name: name, phone: phone, cat: cat, address: address, notes: notes,
     total: money(d.total), payNow: money(d.payNow), balance: money(d.balance),
+    firstTime: d.firstTime === true,
   };
 }
 
@@ -292,20 +297,27 @@ function notify_(code, token, v) {
   const rows = [
     ['Servicio', v.service === 'pack' ? 'Semana michi (' + v.days + ' días)' : 'Visita michi'],
     ['Fecha', v.date], ['Llegada', pad_(v.hour) + ':00'], ['Gatos', v.cats],
-    ['Valor estimado', money(v.total)], ['Pago al confirmar', money(v.payNow)], ['Saldo', money(v.balance)],
+    ['Valor estimado', money(v.total)],
+  ].concat(v.firstTime
+    ? [['Pago', 'En el encuentro de bienvenida']]
+    : [['Pago al confirmar', money(v.payNow)], ['Saldo', money(v.balance)]]
+  ).concat([
     ['Nombre', v.name], ['Celular', v.phone], ['Michi', v.cat], ['Dirección', v.address], ['Notas', v.notes || '—'],
-  ].map(function (r) { return '<tr><td style="padding:4px 12px 4px 0;color:#8A6366">' + r[0] + '</td><td style="padding:4px 0;font-weight:bold">' + esc(r[1]) + '</td></tr>'; }).join('');
+  ]).map(function (r) { return '<tr><td style="padding:4px 12px 4px 0;color:#8A6366">' + r[0] + '</td><td style="padding:4px 0;font-weight:bold">' + esc(r[1]) + '</td></tr>'; }).join('');
   const btn = function (href, label, bg) {
     return '<a href="' + href + '" style="display:inline-block;padding:12px 22px;margin:6px 8px 0 0;border-radius:24px;background:' + bg + ';color:#fff;font-weight:bold;text-decoration:none">' + label + '</a>';
   };
   MailApp.sendEmail({
     to: to,
-    subject: '😻 Nueva reserva ' + code + ' · ' + v.date + ' ' + pad_(v.hour) + ':00 · ' + v.name,
+    subject: (v.firstTime ? '🌟 Cliente nuevo · ' : '😻 ') + 'Nueva reserva ' + code + ' · ' + v.date + ' ' + pad_(v.hour) + ':00 · ' + v.name,
     htmlBody: '<div style="font-family:Arial,sans-serif;color:#5B3A3F">' +
       '<h2 style="margin:0 0 8px">Nueva reserva ' + code + ' (pendiente)</h2>' +
       '<p>Se vence sola en ' + (CONFIG.PENDING_HOURS === 1 ? '1 hora' : CONFIG.PENDING_HOURS + ' horas') + ' si no la confirmas.</p>' +
       '<table>' + rows + '</table>' +
-      '<p style="margin-top:16px">Cuando el cliente te envíe el comprobante por WhatsApp:</p>' +
+      (v.firstTime
+        ? '<p style="margin-top:16px;padding:12px 14px;border-radius:12px;background:#FFF4E0"><b>🌟 Es su primera vez.</b> Escríbele para acordar el encuentro de bienvenida (gratis). ' +
+          'Cuando lo acuerden, pulsa <b>Confirmar</b> para dejar el horario reservado. El pago lo hace en el encuentro, con ustedes presentes.</p>'
+        : '<p style="margin-top:16px">Cuando el cliente te envíe el comprobante por WhatsApp:</p>') +
       btn(link('confirm'), '✅ Confirmar', '#2E9E5B') + btn(link('cancel'), '❌ Cancelar', '#B9506B') +
       '</div>',
   });

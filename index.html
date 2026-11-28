@@ -670,6 +670,15 @@
     .cal-status { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--cocoa-light); }
     .done-code { display: inline-block; margin: 0 0 14px; padding: 8px 16px; border-radius: 12px; background: var(--pink-mist); border: 1.5px dashed var(--pink); font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 600; color: var(--pink-dark); letter-spacing: 1px; }
     .done-note { font-size: 13px; color: var(--cocoa-light); }
+    .first-box { display: flex; flex-direction: row; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: #FFF4E0; border: 1.5px solid #F3C98B; cursor: pointer; }
+    .first-box input { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; accent-color: var(--pink-deep); }
+    .first-box b { display: block; font-size: 15px; color: var(--cocoa); }
+    .first-box span span { font-size: 13px; color: var(--cocoa-sub); }
+    .trust-strip { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .trust-item { display: flex; gap: 14px; align-items: flex-start; background: var(--white); border: 1.5px dashed var(--pink); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-soft); }
+    .trust-item .ico { font-size: 28px; line-height: 1; }
+    .trust-item b { display: block; font-family: 'Fredoka', sans-serif; font-size: 19px; font-weight: 600; color: var(--cocoa); margin-bottom: 2px; }
+    .trust-item p { font-size: 15px; color: var(--cocoa-sub); }
     .field .count { align-self: flex-end; font-size: 12px; color: var(--cocoa-light); font-variant-numeric: tabular-nums; }
 
     .summary { background: var(--cream); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; margin-bottom: 16px; }
@@ -723,6 +732,7 @@
       .chip.c2 { top: auto; bottom: 74px; right: 12px; }
       .chip.c3 { bottom: 18px; left: 12px; }
       .trust-grid { grid-template-columns: 1fr; }
+      .trust-strip { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; gap: 48px; }
       .about-card:nth-child(2) .polaroid { margin-top: 0; }
       .cleo { grid-template-columns: 1fr; gap: 36px; margin-bottom: 64px; max-width: 460px; margin-left: auto; margin-right: auto; }
@@ -860,7 +870,7 @@
         <div class="steps">
           <div class="step reveal"><div class="step-ico"><svg class="cal-ico" viewBox="0 0 64 64" role="img" aria-label="Calendario: 17 de septiembre"><rect x="6" y="10" width="52" height="48" rx="10" fill="#FFFFFF" stroke="#E9C5CC" stroke-width="2"/><path d="M6 20a10 10 0 0 1 10-10h32a10 10 0 0 1 10 10v6H6z" fill="#CF6A82"/><rect x="18" y="4" width="5" height="13" rx="2.5" fill="#8A6366"/><rect x="41" y="4" width="5" height="13" rx="2.5" fill="#8A6366"/><text x="32" y="23" text-anchor="middle" font-family="Nunito, Arial, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="1.5">SEP</text><text x="32" y="51" text-anchor="middle" font-family="Fredoka, Nunito, Arial, sans-serif" font-size="24" font-weight="700" fill="#5B3A3F">17</text></svg></div><h3>Elige día y hora</h3><p>Abre el calendario y escoge el día y la hora de la visita.</p></div>
           <div class="step reveal"><div class="step-ico">💬</div><h3>Confirma por WhatsApp</h3><p>Nos envías tu reserva por WhatsApp, te mandamos los datos de pago y, al pagar, tu visita queda confirmada.</p></div>
-          <div class="step reveal"><div class="step-ico">🔑</div><h3>Nos conocemos</h3><p>Antes de empezar te visitamos: conocemos a tu michi y sus mañas, y acordamos contigo cómo recibir y cuidar el acceso a tu casa (llaves, portería o clave).</p></div>
+          <div class="step reveal"><div class="step-ico">🔑</div><h3>Nos conocemos</h3><p>Antes de empezar te visitamos gratis: conocemos a tu michi y sus mañas, y acordamos contigo cómo recibir y cuidar el acceso a tu casa (llaves, portería o clave).</p></div>
           <div class="step reveal"><div class="step-ico">😻</div><h3>Viaja tranquilo</h3><p>Cuidamos a tu gato en su casa y te mandamos video 360° y reporte en cada visita.</p></div>
         </div>
       </div>
@@ -942,6 +952,10 @@
             </ul>
             <button class="btn btn-ghost" data-book data-service="visit">Agendar visita</button>
           </article>
+        </div>
+        <div class="trust-strip">
+          <div class="trust-item reveal"><span class="ico">🌟</span><div><b>¿Primera vez? Nos conocemos gratis</b><p>Antes de tu primera visita te visitamos sin costo y pagas en ese encuentro, con nosotros presentes.</p></div></div>
+          <div class="trust-item reveal"><span class="ico">💕</span><div><b>Garantía de tranquilidad</b><p>Si tu primera visita no te deja tranquilo, te devolvemos tu dinero.</p></div></div>
         </div>
       </div>
     </section>
@@ -1031,7 +1045,9 @@
           <details class="reveal"><summary>¿Qué hacemos en cada visita?</summary><p>Le damos comida y agua fresca, limpiamos su arena, sacamos la basurita, jugamos y lo consentimos, y te mandamos el video 360°. En la visita previa te contamos cómo organizamos la visita según tu michi.</p></details>
           <details class="reveal"><summary>¿Qué es el video 360°?</summary><p>Queremos que sientas que estuviste ahí. En cada visita grabamos un video 360° que recorre todo alrededor: ves a tu michi, cómo está, su comida, su arenero y cómo queda su espacio. Es nuestra forma de trabajar con total transparencia: queda constancia de todo lo que hacemos durante la visita, y te lo enviamos por WhatsApp apenas terminamos, estés donde estés.</p></details>
           <details class="reveal"><summary>¿Cómo agendo mi visita?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te guardamos el horario por <span data-hold>1 hora</span>, te enviamos los datos de pago y, cuando pagues, tu visita queda confirmada.</p></details>
-          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% y tus visitas quedan confirmadas. El saldo lo pagas en la visita previa, cuando nos reunimos para coordinar el acceso a tu casa.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
+          <details class="reveal"><summary>¿Es tu primera vez con nosotros?</summary><p>¡Bienvenido! Antes de tu primera visita nos reunimos contigo gratis y sin compromiso: conocemos a tu michi y sus mañas, y acordamos cómo recibir y cuidar el acceso a tu casa. El pago lo haces en ese encuentro, con nosotros presentes. Al agendar, solo marca «Es mi primera vez».</p></details>
+          <details class="reveal"><summary>¿Y si no me gusta la primera visita?</summary><p>Tienes nuestra garantía de tranquilidad: si tu primera visita no te deja tranquilo, te devolvemos tu dinero. Así de seguros estamos de cuidar bien a tu michi.</p></details>
+          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% y tus visitas quedan confirmadas. El saldo lo pagas en la visita previa, cuando nos reunimos para coordinar el acceso a tu casa.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, con nosotros presentes.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese horario ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En la visita previa, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
           <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
@@ -1106,6 +1122,7 @@
         <div data-step="3" hidden>
           <div class="summary" id="summary"></div>
           <form class="form-grid" id="bookForm" novalidate>
+            <label class="field full first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span>Nos conocemos gratis antes del servicio y pagas en ese encuentro, con nosotros presentes.</span></span></label>
             <div class="field"><label for="fCats">¿Cuántos gatos?</label><select id="fCats"><option>1</option><option>2</option><option>3</option><option>4 o más</option></select></div>
             <div class="field"><label for="fCat">Nombre de tu michi</label><input id="fCat" maxlength="60" autocomplete="off" autocapitalize="words" required aria-describedby="fCatMsg" /><span class="msg" id="fCatMsg"></span></div>
             <div class="field"><label for="fName">Tu nombre</label><input id="fName" maxlength="60" autocomplete="name" autocapitalize="words" required aria-describedby="fNameMsg" /><span class="msg" id="fNameMsg"></span></div>
@@ -1128,7 +1145,7 @@
             <div class="btns">
               <a class="btn btn-wa" id="doneWa" href="#" target="_blank" rel="noopener">Enviar mensaje por WhatsApp</a>
               <div class="done-after" id="doneAfter" hidden>
-                <p class="done-sent">✓ <b>¡Gracias! 😻</b> Te respondemos por WhatsApp con los datos para el pago. Apenas lo recibamos, tu visita queda confirmada y tu michi en buenas manos.</p>
+                <p class="done-sent" id="doneSent">✓ <b>¡Gracias! 😻</b> Te respondemos por WhatsApp con los datos para el pago. Apenas lo recibamos, tu visita queda confirmada y tu michi en buenas manos.</p>
                 <button class="btn btn-ghost" id="doneIcs">Agregar a mi calendario</button>
                 <button class="btn btn-ghost" id="doneClose">Cerrar</button>
               </div>
@@ -1392,11 +1409,14 @@
       // Visita suelta: pago total cuando confirmamos la visita. Paquete: anticipo al confirmar y saldo en la visita previa.
       const isPack = state.service === 'pack';
       const deposit = isPack ? Math.ceil(total * P.depositPct / 100 / 1000) * 1000 : total;
-      const payLines = isPack
-        ? [['Anticipo para confirmar (' + P.depositPct + '%)', deposit], ['Saldo en la visita previa', total - deposit]]
+      const first = $('#fFirst').checked;
+      // Primera vez: se paga todo en el encuentro de bienvenida, con ellos presentes
+      const payLines = first ? []
+        : isPack ? [['Anticipo para confirmar (' + P.depositPct + '%)', deposit], ['Saldo en la visita previa', total - deposit]]
         : []; // la visita suelta se paga completa: basta con el valor total
       const totalLabel = isPack ? 'Valor del paquete' : 'Valor de la visita';
-      return { rows, total, deposit, payLines, totalLabel };
+      if (first) rows.push(['Primera vez', 'Sí 🌟']);
+      return { rows, total, deposit: first ? 0 : deposit, payLines, totalLabel, first };
     }
 
     function renderSummary() {
@@ -1404,7 +1424,9 @@
       $('#summary').innerHTML = q.rows.map(r => '<div class="summary-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('') +
         '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
         q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
-        '<small>' + (state.service === 'pack'
+        '<small>' + (q.first
+          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>: es gratis, conocemos a tu michi y acordamos el acceso a tu casa. <b>El pago lo haces en ese encuentro</b>, con nosotros presentes. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
+          : state.service === 'pack'
           ? 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos para el anticipo y, cuando lo pagues, tus visitas quedan confirmadas. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
           : 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos de pago y, cuando pagues, tu visita queda confirmada. ') +
         'Pagas por ' + payText + '. ' +
@@ -1560,6 +1582,7 @@
     }
     $('#fConsent').addEventListener('change', e => e.target.closest('.field').classList.remove('err'));
     $('#fCats').addEventListener('change', renderSummary);
+    $('#fFirst').addEventListener('change', renderSummary);
 
     let lastMsg = '', sending = false;
     const ERRORS = {
@@ -1589,7 +1612,7 @@
               service: state.service, date: ymd(state.date), hour: state.hour, cats,
               name: val('fName'), phone: phoneDigits($('#fPhone').value), cat: val('fCat'), address: val('fAddr'), notes: nt,
               consent: $('#fConsent').checked, website: $('#fWebsite').value,
-              total: q.total, payNow: q.deposit, balance: q.total - q.deposit,
+              total: q.total, payNow: q.deposit, balance: q.total - q.deposit, firstTime: q.first,
             }),
           });
           const d = await res.json();
@@ -1615,6 +1638,7 @@
       q.rows.forEach(r => lines.push('• ' + r[0] + ': ' + r[1]));
       lines.push('• ' + q.totalLabel + ': ' + money(q.total));
       q.payLines.forEach(p => lines.push('• ' + p[0] + ': ' + money(p[1])));
+      if (q.first) lines.push('• Pago: en el encuentro de bienvenida');
       lines.push('');
       lines.push('Mis datos:');
       lines.push('• Nombre: ' + val('fName'));
@@ -1629,6 +1653,9 @@
       $('#doneCode').textContent = code ? 'Código ' + code : '';
       $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
       // Texto fijo (sin datos del cliente), por eso se puede usar innerHTML
+      $('#doneSent').innerHTML = q.first
+        ? '✓ <b>¡Gracias! 😻</b> Te escribimos por WhatsApp para acordar el encuentro de bienvenida. Es gratis y el pago lo haces allí, con nosotros presentes.'
+        : '✓ <b>¡Gracias! 😻</b> Te respondemos por WhatsApp con los datos para el pago. Apenas lo recibamos, tu visita queda confirmada y tu michi en buenas manos.';
       $('#doneText').innerHTML = (code ? 'Te guardamos este horario por ' + holdText() + '.' : '') +
         '<span class="done-step">👉 <b>Último paso:</b> pulsa el botón verde, envíanos el mensaje por WhatsApp y luego <b>vuelve a esta página</b>.</span>';
       $('#doneNote').hidden = !offline;

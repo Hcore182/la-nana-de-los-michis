@@ -63,6 +63,7 @@ Suban el cambio a GitHub y listo.
 |---|---|
 | Llega una reserva | Les llega un correo "😻 Nueva reserva LNM-XXXX". La hora queda bloqueada como **pendiente**. |
 | El cliente paga y envía el comprobante por WhatsApp | Busquen el código `LNM-XXXX` del mensaje en su correo y pulsen **✅ Confirmar**. |
+| Llega un **cliente nuevo** (correo "🌟 Cliente nuevo") | Escríbanle para acordar el encuentro de bienvenida (gratis). Cuando lo acuerden, pulsen **✅ Confirmar** para dejar el horario reservado. El pago lo hace en el encuentro, con ustedes presentes. |
 | El cliente no paga | No hagan nada: a la **1 hora** pasa sola a **vencida** y la hora se libera. |
 | El cliente cancela | Pulsen **❌ Cancelar** en el correo, o cambien el estado en la hoja. |
 | Quieren ver la agenda | Abran la hoja (también funciona en la app de Google Sheets del celular) y filtren por fecha. |
