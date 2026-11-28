@@ -954,7 +954,7 @@
           </article>
         </div>
         <div class="trust-strip">
-          <div class="trust-item reveal"><span class="ico">🌟</span><div><b>¿Primera vez? Conócenos antes de decidir</b><p>Nos reunimos contigo sin costo para conocer a tu michi y resolver tus dudas. Si te sientes en confianza, reservas y pagas su visita ahí mismo, con nosotros presentes. Si no, no pagas nada.</p></div></div>
+          <div class="trust-item reveal"><span class="ico">🌟</span><div><b>¿Primera vez? Conócenos antes de decidir</b><p>Primero nos reunimos contigo, sin costo, para conocer a tu michi y resolver tus dudas. Solo si te sientes en confianza, confirmas y pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada.</p></div></div>
           <div class="trust-item reveal"><span class="ico">💕</span><div><b>Garantía de tranquilidad</b><p>Si tu primera visita no te deja tranquilo, te devolvemos tu dinero.</p></div></div>
         </div>
       </div>
@@ -1045,7 +1045,7 @@
           <details class="reveal"><summary>¿Qué hacemos en cada visita?</summary><p>Le damos comida y agua fresca, limpiamos su arena, sacamos la basurita, jugamos y lo consentimos, y te mandamos el video 360°. En el encuentro de bienvenida te contamos cómo organizamos la visita según tu michi.</p></details>
           <details class="reveal"><summary>¿Qué es el video 360°?</summary><p>Queremos que sientas que estuviste ahí. En cada visita grabamos un video 360° que recorre todo alrededor: ves a tu michi, cómo está, su comida, su arenero y cómo queda su espacio. Es nuestra forma de trabajar con total transparencia: queda constancia de todo lo que hacemos durante la visita, y te lo enviamos por WhatsApp apenas terminamos, estés donde estés.</p></details>
           <details class="reveal"><summary>¿Cómo agendo mi visita?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te guardamos el horario por <span data-hold>1 hora</span>, te enviamos los datos de pago y, cuando pagues, tu visita queda confirmada.</p></details>
-          <details class="reveal"><summary>¿Es tu primera vez con nosotros?</summary><p>¡Bienvenido! Antes del servicio nos reunimos contigo sin costo en el encuentro de bienvenida: conocemos a tu michi y sus mañas, resolvemos tus dudas y acordamos cómo recibir y cuidar el acceso a tu casa. Si te sientes en confianza, pagas su visita ahí mismo, con nosotros presentes. Si no, no pagas nada. Al agendar, solo marca «Es mi primera vez».</p></details>
+          <details class="reveal"><summary>¿Es tu primera vez con nosotros?</summary><p>¡Bienvenido! Primero nos reunimos contigo, sin costo, en el encuentro de bienvenida: conocemos a tu michi y sus mañas, resolvemos tus dudas y acordamos cómo recibir y cuidar el acceso a tu casa. Solo si te sientes en confianza, confirmas y pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada. Al agendar, solo marca «Es mi primera vez».</p></details>
           <details class="reveal"><summary>¿Y si no me gusta la primera visita?</summary><p>Tienes nuestra garantía de tranquilidad: si tu primera visita no te deja tranquilo, te devolvemos tu dinero. Así de seguros estamos de cuidar bien a tu michi.</p></details>
           <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas un anticipo del <span data-deposit>50</span>% y tus visitas quedan confirmadas. El saldo lo pagas en el encuentro de bienvenida, cuando nos reunimos para coordinar el acceso a tu casa.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, solo si decides quedarte con nosotros.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese horario ya quedó reservado para tu michi.</p></details>
@@ -1122,7 +1122,7 @@
         <div data-step="3" hidden>
           <div class="summary" id="summary"></div>
           <form class="form-grid" id="bookForm" novalidate>
-            <label class="field full first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span>Nos reunimos gratis antes del servicio. Si te sientes en confianza, pagas la visita ahí mismo; si no, no pagas nada.</span></span></label>
+            <label class="field full first-box" for="fFirst"><input type="checkbox" id="fFirst" /><span><b>🌟 Es mi primera vez con La nAna de los Michis</b><span>Primero nos reunimos gratis. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo; si no, no pagas nada.</span></span></label>
             <div class="field"><label for="fCats">¿Cuántos gatos?</label><select id="fCats"><option>1</option><option>2</option><option>3</option><option>4 o más</option></select></div>
             <div class="field"><label for="fCat">Nombre de tu michi</label><input id="fCat" maxlength="60" autocomplete="off" autocapitalize="words" required aria-describedby="fCatMsg" /><span class="msg" id="fCatMsg"></span></div>
             <div class="field"><label for="fName">Tu nombre</label><input id="fName" maxlength="60" autocomplete="name" autocapitalize="words" required aria-describedby="fNameMsg" /><span class="msg" id="fNameMsg"></span></div>
@@ -1425,7 +1425,7 @@
         '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
         q.payLines.map(p => '<div class="summary-row pay"><span>' + p[0] + '</span><span>' + money(p[1]) + '</span></div>').join('') +
         '<small>' + (q.first
-          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>: nos reunimos contigo sin costo para conocer a tu michi y resolver tus dudas. <b>Si te sientes en confianza, pagas su visita ahí mismo</b>, con nosotros presentes; si no, no pagas nada. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
+          ? 'Al reservar te guardamos el horario por ' + holdText() + ' y te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b>: primero nos reunimos contigo, sin costo, para conocer a tu michi y resolver tus dudas. <b>Solo si te sientes en confianza, confirmas y pagas la visita de tu michi ahí mismo</b>, con nosotros presentes; si no, no pagas nada. Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero. '
           : state.service === 'pack'
           ? 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos para el anticipo y, cuando lo pagues, tus visitas quedan confirmadas. El saldo lo pagas cuando nos reunimos para coordinar el acceso a tu casa. '
           : 'Al reservar te guardamos el horario por ' + holdText() + '. Te enviamos por WhatsApp los datos de pago y, cuando pagues, tu visita queda confirmada. ') +
@@ -1654,7 +1654,7 @@
       $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
       // Texto fijo (sin datos del cliente), por eso se puede usar innerHTML
       $('#doneSent').innerHTML = q.first
-        ? '✓ <b>¡Gracias! 😻</b> Te escribimos por WhatsApp para acordar el encuentro de bienvenida. Es sin costo y, si te sientes en confianza, pagas la visita ahí mismo.'
+        ? '✓ <b>¡Gracias! 😻</b> Te escribimos por WhatsApp para acordar el encuentro de bienvenida. Es sin costo y, solo si te sientes en confianza, pagas la visita de tu michi ahí mismo.'
         : '✓ <b>¡Gracias! 😻</b> Te respondemos por WhatsApp con los datos para el pago. Apenas lo recibamos, tu visita queda confirmada y tu michi en buenas manos.';
       $('#doneText').innerHTML = (code ? 'Te guardamos este horario por ' + holdText() + '.' : '') +
         '<span class="done-step">👉 <b>Último paso:</b> pulsa el botón verde, envíanos el mensaje por WhatsApp y luego <b>vuelve a esta página</b>.</span>';
