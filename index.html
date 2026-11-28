@@ -61,7 +61,7 @@
         weekPack:     [196000, 240000, 284000, 322000],
       },
       nightSurchargePct: 20, // Recargo por horario nocturno o muy temprano
-      depositPct:   50,      // Semana michi de cliente nuevo: anticipo en el encuentro; el saldo, el primer día
+      depositPct:   50,      // Sin uso por ahora: todos los servicios se pagan en un solo pago
     },
     // ── Agenda ────────────────────────────────────────────────────────
     schedule: {
@@ -1058,7 +1058,7 @@
           <details class="reveal"><summary>¿Cómo agendo mi visita?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te guardamos el horario por <span data-hold>1 hora</span>, te enviamos los datos de pago y, cuando pagues, tu visita queda confirmada. ¿Primera vez? Te reservamos el horario y pagas en el encuentro de bienvenida.</p></details>
           <details class="reveal"><summary>¿Es tu primera vez con nosotros?</summary><p>¡Qué alegría conocerte! Trabajamos sobre todo con familias que nos recomiendan y ya confían en nosotros, y queremos ganarnos también tu confianza. Por eso coordinamos un encuentro de bienvenida: un rato para conocernos, conocer a tu michi y sus mañas, resolver tus dudas y acordar cómo recibir y cuidar el acceso a tu casa, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada. Al agendar, solo marca «Es mi primera vez».</p></details>
           <details class="reveal"><summary>¿Y si no me gusta la primera visita?</summary><p>Tienes nuestra garantía de tranquilidad: si tu primera visita no te da tranquilidad, te devolvemos tu dinero. Y si tomaste la Semana michi, te devolvemos el paquete completo. Así de seguros estamos de cuidar bien a tu michi.</p></details>
-          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas el paquete completo y tus visitas quedan confirmadas.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, solo si te sientes en confianza. En la Semana michi pagas ahí el <span data-deposit>50</span>% y el saldo, el primer día del servicio.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
+          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas el paquete completo y tus visitas quedan confirmadas.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, en un solo pago, solo si te sientes en confianza.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese horario ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En el encuentro de bienvenida, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
           <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
@@ -1428,16 +1428,12 @@
         if (special) rows.push(['Tarifa', 'Domingo o festivo']);
         if (isNight(h)) { rows.push(['Horario nocturno', '+' + P.nightSurchargePct + '%']); total = Math.ceil(total * (1 + P.nightSurchargePct / 100) / 1000) * 1000; }
       }
-      // Visita suelta: pago total para confirmar. Paquete: anticipo para confirmar y saldo en el encuentro de bienvenida.
+      // Un solo pago por servicio (ver payLines más abajo).
       const isPack = state.service === 'pack';
       const first = $('#fFirst').checked;
-      // Cliente que repite: paga todo para confirmar (visita o paquete).
-      // Primera vez: paga en el encuentro de bienvenida; en la Semana michi, el anticipo
-      // en el encuentro y el saldo el primer día del servicio.
-      const deposit = first && isPack ? Math.ceil(total * P.depositPct / 100 / 1000) * 1000 : total;
-      const payLines = first && isPack
-        ? [['Anticipo en el encuentro de bienvenida (' + P.depositPct + '%)', deposit], ['Saldo el primer día del servicio', total - deposit]]
-        : [];
+      // Un solo pago: quien repite paga al reservar; el cliente nuevo, en el encuentro de bienvenida
+      const deposit = total;
+      const payLines = [];
       const totalLabel = isPack ? 'Valor del paquete' : 'Valor de la visita';
       if (first) rows.push(['Primera vez', 'Sí 🌟']);
       return { rows, total, deposit, payLines, totalLabel, first, isPack };
@@ -1446,7 +1442,7 @@
     function renderSummary() {
       const q = quote();
       $('#firstPay').textContent = q.isPack
-        ? 'pagas el ' + C.prices.depositPct + '% del paquete ahí mismo (el saldo, el primer día del servicio)'
+        ? 'pagas el paquete de tu michi ahí mismo'
         : 'pagas la visita de tu michi ahí mismo';
       $('#summary').innerHTML = q.rows.map(r => '<div class="summary-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>').join('') +
         '<div class="summary-row total"><span>' + q.totalLabel + '</span><span>' + money(q.total) + '</span></div>' +
@@ -1672,7 +1668,7 @@
       q.rows.forEach(r => lines.push('• ' + r[0] + ': ' + r[1]));
       lines.push('• ' + q.totalLabel + ': ' + money(q.total));
       q.payLines.forEach(p => lines.push('• ' + p[0] + ': ' + money(p[1])));
-      if (q.first && !q.isPack) lines.push('• Pago: en el encuentro de bienvenida');
+      if (q.first) lines.push('• Pago: en el encuentro de bienvenida');
       lines.push('');
       lines.push('Mis datos:');
       lines.push('• Nombre: ' + val('fName'));
@@ -1688,7 +1684,7 @@
       $('#doneTitle').textContent = code ? '¡Reserva recibida! 😻' : '¡Casi listo!';
       // Texto fijo (sin datos del cliente), por eso se puede usar innerHTML
       $('#doneSent').innerHTML = q.first
-        ? '✓ <b>¡Gracias! 😻</b> Te escribimos por WhatsApp para coordinar el encuentro de bienvenida: un rato para conocernos, sin costo. Solo si te sientes en confianza, ' + (q.isPack ? 'pagas el ' + C.prices.depositPct + '% del paquete ahí mismo.' : 'pagas la visita de tu michi ahí mismo.')
+        ? '✓ <b>¡Gracias! 😻</b> Te escribimos por WhatsApp para coordinar el encuentro de bienvenida: un rato para conocernos, sin costo. Solo si te sientes en confianza, ' + (q.isPack ? 'pagas el paquete de tu michi ahí mismo.' : 'pagas la visita de tu michi ahí mismo.')
         : '✓ <b>¡Gracias! 😻</b> Te respondemos por WhatsApp con los datos para el pago. Apenas lo recibamos, tu visita queda confirmada y tu michi en buenas manos.';
       $('#doneText').innerHTML = (code ? 'Te guardamos este horario por ' + holdText() + '.' : '') +
         '<span class="done-step">👉 <b>Último paso:</b> pulsa el botón verde, envíanos el mensaje por WhatsApp y luego <b>vuelve a esta página</b>.</span>';
