@@ -780,6 +780,7 @@
       .day { border-radius: 11px; font-size: 14px; }
     }
     @media (max-width: 380px) {
+      .btn-reserve .cta-heart { display: none; }
       .brand-text b { font-size: 14.5px; white-space: nowrap; }
       .btn-nav { padding: 8px 12px; font-size: 13px; }
       .brand-badge { width: 40px; height: 40px; }
@@ -1136,7 +1137,7 @@
               <p class="fs-title">¡Bienvenido! Así funciona tu primera vez:</p>
               <ol>
                 <li>Te guardamos el horario por <span data-hold>1 hora</span>.</li>
-                <li>Te escribimos por WhatsApp para acordar el <b>encuentro de bienvenida</b> y conocernos, sin costo.</li>
+                <li>Te escribimos por WhatsApp para coordinar el <b>encuentro de bienvenida</b>: un rato para conocernos, conocer a tu michi y resolver tus dudas, sin costo.</li>
                 <li><b>Solo si te sientes en confianza</b>, pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada.</li>
               </ol>
               <p class="fs-guarantee">💕 Y si tu primera visita no te deja tranquilo, te devolvemos tu dinero.</p>
@@ -1456,7 +1457,7 @@
 
     const LABELS = { 1: 'Paso 1 de 3 · Elige el día', 2: 'Paso 2 de 3 · Elige la hora de llegada', 3: 'Paso 3 de 3 · Tus datos', 4: '¡Solicitud lista!' };
     function showAlert(msg) { const a = $('#bookAlert'); a.textContent = msg; a.hidden = false; $('#bookBody').scrollTop = 0; }
-    const RESERVE_HTML = () => '<span class="cta-ico" aria-hidden="true">😻</span><span class="cta-txt"><b>¡Reservar mi visita!</b></span><span class="cta-heart" aria-hidden="true">💕</span>';
+    const RESERVE_HTML = () => '<span class="cta-ico" aria-hidden="true">😻</span><span class="cta-txt"><b>' + ($('#fFirst').checked ? '¡Reservar y conocernos!' : '¡Reservar mi visita!') + '</b></span><span class="cta-heart" aria-hidden="true">💕</span>';
     function setNextLabel(step) {
       const next = $('#bookNext');
       next.classList.toggle('btn-reserve', step === 3);
@@ -1609,6 +1610,7 @@
       $('#firstHint').hidden = on;
       $('#firstWrap').classList.toggle('on', on);
       renderSummary();
+      if (state.step === 3) setNextLabel(3); // el botón cambia a '¡Reservar y conocernos!'
     });
 
     let lastMsg = '', sending = false;
