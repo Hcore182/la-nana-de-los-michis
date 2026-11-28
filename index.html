@@ -424,6 +424,7 @@
     .plan li::before { content: '🐾'; font-size: 13px; margin-top: 3px; }
     .plan .btn { width: 100%; }
     .fine { margin-top: 14px; font-size: 14px; color: var(--cocoa-light); }
+    .night-note { margin-top: 22px; text-align: center; color: var(--cocoa-sub); font-weight: 600; }
 
     /* Confianza */
     .trust { background: var(--white); }
@@ -963,6 +964,7 @@
             <button class="btn btn-ghost" data-book data-service="visit">Agendar visita</button>
           </article>
         </div>
+        <p class="fine night-note">🌙 Visitas que empiezan antes de las <span data-night-before>7:00 a. m.</span> o desde las <span data-night-from>7:00 p. m.</span>: +<span data-night>20</span>%.</p>
         <div class="trust-strip">
           <div class="trust-item reveal"><span class="ico">🌟</span><div><b>¿Primera vez? Conócenos antes de decidir</b><p>Coordinamos un encuentro de bienvenida: un rato para conocernos, conocer a tu michi y resolver tus dudas, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada.</p></div></div>
           <div class="trust-item reveal"><span class="ico">💕</span><div><b>Garantía de tranquilidad</b><p>Si tu primera visita no te da tranquilidad, te devolvemos tu dinero.</p></div></div>
@@ -1058,10 +1060,9 @@
           <details class="reveal"><summary>¿Cómo agendo mi visita?</summary><p>Eliges el día y la hora en el calendario y nos llega tu solicitud por WhatsApp. Te guardamos el horario por <span data-hold>1 hora</span>, te enviamos los datos de pago y, cuando pagues, tu visita queda confirmada. ¿Primera vez? Te reservamos el horario y pagas en el encuentro de bienvenida.</p></details>
           <details class="reveal"><summary>¿Es tu primera vez con nosotros?</summary><p>¡Qué alegría conocerte! Trabajamos sobre todo con familias que nos recomiendan y ya confían en nosotros, y queremos ganarnos también tu confianza. Por eso coordinamos un encuentro de bienvenida: un rato para conocernos, conocer a tu michi y sus mañas, resolver tus dudas y acordar cómo recibir y cuidar el acceso a tu casa, sin costo. Solo si te sientes en confianza, pagas la visita de tu michi ahí mismo, con nosotros presentes. Si no, no pagas nada. Al agendar, solo marca «Es mi primera vez».</p></details>
           <details class="reveal"><summary>¿Y si no me gusta la primera visita?</summary><p>Tienes nuestra garantía de tranquilidad: si tu primera visita no te da tranquilidad, te devolvemos tu dinero. Y si tomaste la Semana michi, te devolvemos el paquete completo. Así de seguros estamos de cuidar bien a tu michi.</p></details>
-          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span> y te enviamos por WhatsApp los datos de pago.<br /><b>Visita michi o de domingo/festivo:</b> pagas el valor total y tu visita queda confirmada.<br /><b>Semana michi:</b> pagas el paquete completo y tus visitas quedan confirmadas.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, en un solo pago, solo si te sientes en confianza.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
+          <details class="reveal"><summary>¿Cuándo y cómo pago?</summary><p>Al reservar te guardamos el horario por <span data-hold>1 hora</span>.<br /><b>Si ya nos conoces:</b> te enviamos por WhatsApp los datos de pago. Visita michi o de domingo/festivo: pagas el valor total; Semana michi: pagas el paquete completo. Con el pago, queda confirmada.<br /><b>¿Primera vez?</b> Pagas en el encuentro de bienvenida, en un solo pago, solo si te sientes en confianza.<br /><b>Medios de pago:</b> <span data-pay>Nequi, Daviplata o Llave Bre-B</span>.</p></details>
           <details class="reveal"><summary>¿Qué pasa si cancelo?</summary><p>Si cancelas con 6 horas o más de anticipación te devolvemos lo que hayas pagado. Con menos de 6 horas no hay devolución, porque ese horario ya quedó reservado para tu michi.</p></details>
           <details class="reveal"><summary>¿Cómo les doy acceso a mi casa?</summary><p>En el encuentro de bienvenida, antes del servicio, nos presentas a tu michi y acordamos contigo cómo recibir y cuidar el acceso a tu casa: llaves, portería o clave, lo que te dé más tranquilidad. Si nos dejas llaves, quedan siempre bajo nuestro cuidado y al terminar te las devolvemos como acordemos.</p></details>
-          <details class="reveal"><summary>¿Atienden fuera de Fusagasugá?</summary><p>Escríbenos por WhatsApp con tu barrio o vereda y te confirmamos si llegamos hasta allá.</p></details>
           <details class="reveal"><summary>¿Y si tengo más de un gato?</summary><p>¡Felices de conocerlos a todos! Cada gato adicional suma unos <span data-price="extraCat">$7.000</span> por visita. Al agendar eliges cuántos son y ves el valor exacto antes de enviar tu solicitud.</p></details>
         </div>
       </div>
@@ -1208,6 +1209,9 @@
     const payText = C.paymentMethods.length > 1 ? C.paymentMethods.slice(0, -1).join(', ') + ' o ' + C.paymentMethods[C.paymentMethods.length - 1] : C.paymentMethods.join('');
     $$('[data-pay]').forEach(el => el.textContent = payText);
     $$('[data-hold]').forEach(el => el.textContent = holdText());
+    $$('[data-night]').forEach(el => el.textContent = C.prices.nightSurchargePct);
+    $$('[data-night-before]').forEach(el => el.textContent = hourLabel(C.schedule.nightBefore));
+    $$('[data-night-from]').forEach(el => el.textContent = hourLabel(C.schedule.nightFrom));
     $('#year').textContent = new Date().getFullYear();
     const fl = $('#footerLinks');
     if (C.instagram) fl.insertAdjacentHTML('beforeend', '<a href="' + C.instagram + '" target="_blank" rel="noopener">Instagram</a>');

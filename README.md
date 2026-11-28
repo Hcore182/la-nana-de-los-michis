@@ -22,7 +22,7 @@ Todo lo que cambia seguido está en el bloque `SITE_CONFIG` al inicio de `index.
 
 ## Cómo funciona la agenda
 El cliente elige servicio, día y hora y llena sus datos. La página arma el mensaje
-y abre WhatsApp con la solicitud. La reserva se confirma por WhatsApp con el anticipo.
+y abre WhatsApp con la solicitud. La reserva se confirma por WhatsApp con el pago (el cliente nuevo paga en el encuentro de bienvenida).
 Para que una hora no vuelva a aparecer disponible, agrégala a `bookedSlots`.
 
 ## Reservas en Google Sheets
